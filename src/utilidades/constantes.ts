@@ -1,6 +1,6 @@
 export const DOS_PI = Math.PI * 2;
 export const TOTAL_PUNTOS = 468;
-export const COLORES = {
+export const COLORES: { [nombre: string]: string } = {
   lips: '#E0E0E0',
   leftEye: '#30FF30',
   leftEyebrow: '#30FF30',

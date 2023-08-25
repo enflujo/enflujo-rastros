@@ -1,5 +1,3 @@
-import './scss/estilos.scss';
-
 import '@tensorflow/tfjs-backend-webgl';
 import '@tensorflow-models/face-detection';
 import * as puntosCaras from '@tensorflow-models/face-landmarks-detection';

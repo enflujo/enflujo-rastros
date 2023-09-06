@@ -43,8 +43,12 @@ export default async () => {
     const caras = await detectarCaras();
 
     // Pintar video
-    ctx.drawImage(camara, 0, 0, camara.videoWidth, camara.videoHeight);
-
+    // ctx.drawImage(camara, 0, 0, camara.videoWidth, camara.videoHeight);
+    ctx.save();
+    ctx.globalAlpha = 0.01;
+    ctx.fillStyle = 'tomato';
+    ctx.fillRect(0, 0, lienzo.width, lienzo.height);
+    ctx.restore();
     if (caras && caras.length > 0) {
       pintarCaras(caras);
     }

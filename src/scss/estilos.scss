@@ -23,3 +23,32 @@ body {
 video {
   display: none;
 }
+
+#archivo {
+  // background-color: #130808;
+  color: aliceblue;
+  z-index: 99;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+#textoEnVivo {
+  font-size: 2em;
+  position: fixed;
+  opacity: 0.6;
+  font-size: 2em;
+  top: 0;
+  left: 0;
+  font-family: 'Courier New', Courier, monospace;
+  color: antiquewhite;
+  width: 100vw;
+  text-align: center;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+body {
+  background-color: rgb(31, 27, 25);
+}

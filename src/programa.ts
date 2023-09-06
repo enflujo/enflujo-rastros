@@ -6,8 +6,8 @@ import './scss/estilos.scss';
 import caras from './caras';
 import gestosCara from './gestosCara';
 
-// caras();
-gestosCara();
+caras();
+// gestosCara();
 
 // // console.log('..:: EnFlujo ::..');
 

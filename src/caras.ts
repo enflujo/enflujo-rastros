@@ -1,23 +1,53 @@
-import './scss/estilos.scss';
-
 import '@tensorflow/tfjs-backend-webgl';
 import '@tensorflow-models/face-detection';
 import * as puntosCaras from '@tensorflow-models/face-landmarks-detection';
 import type { Face } from '@tensorflow-models/face-landmarks-detection';
-import { COLORES, DOS_PI, TOTAL_PUNTOS, TRIANGULACION } from './utilidades/constantes';
+import { DOS_PI, TOTAL_PUNTOS, TRIANGULACION } from './utilidades/constantes';
 import { iniciarCamara } from './utilidades/ayudas';
 
+/**
+ * Background configuration
+ */
+const mostrarVideo = false; // show video as background.
+const colorFondo = 'tomato'; // applies if variable "mostrarVideo" is false.
+const opacidadFondo = 0.1; // value from 0.0 to 1.0, paints the background color width alpha to leave a trail/ghost effect.
+/**
+ * Face Mesh configuration
+ */
+const triangular = false; // true shows mesh and false only shows dots.
+const colorMalla = '#32EEDB'; // Color for the mesh lines (only if variable "triangular" is true).
+const grosorLineaMalla = 0.5; // width of the mesh lines (only if variable "triangular" is true).
+
+/**
+ * Face Dots configuration (applies if variable "triangular" is set to false);
+ */
+const colorPuntos = '#FFF'; // Color of the dots.
+const radioPunto = 0.01; // Radio or size of the dots in pixels.
+
+/**
+ * Face features contours configuration
+ */
+const partes: { [nombre: string]: { mostrar: boolean; color: string; ancho: number } } = {
+  lips: { mostrar: false, color: '#E0E0E0', ancho: 2 },
+  leftEye: { mostrar: true, color: '#30FF30', ancho: 1 },
+  leftEyebrow: { mostrar: true, color: '#30FF30', ancho: 0.8 },
+  leftIris: { mostrar: true, color: 'yellow', ancho: 2 },
+  rightEye: { mostrar: true, color: '#FF3030', ancho: 1 },
+  rightEyebrow: { mostrar: true, color: '#FF3030', ancho: 0.8 },
+  rightIris: { mostrar: true, color: 'white', ancho: 2 },
+  faceOval: { mostrar: false, color: '#E0E0E0', ancho: 0.01 },
+};
+
 export default async () => {
-  const triangular = false;
   const lienzo = document.getElementById('lienzo') as HTMLCanvasElement;
   const ctx = lienzo.getContext('2d') as CanvasRenderingContext2D;
   let reloj: number;
-  const GREEN = '#32EEDB';
+
   const camara = await iniciarCamara();
   const model = puntosCaras.SupportedModels.MediaPipeFaceMesh;
   const detectorConfig: puntosCaras.MediaPipeFaceMeshMediaPipeModelConfig = {
-    runtime: 'mediapipe', // o 'tfjs'
-    solutionPath: 'node_modules/@mediapipe/face_mesh', //
+    runtime: 'mediapipe',
+    solutionPath: 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh',
     refineLandmarks: true,
   };
   const detector = await puntosCaras.createDetector(model, detectorConfig);
@@ -44,9 +74,16 @@ export default async () => {
     if (!camara) return;
     const caras = await detectarCaras();
 
-    // Pintar video
-    ctx.drawImage(camara, 0, 0, camara.videoWidth, camara.videoHeight);
+    if (mostrarVideo) {
+      ctx.drawImage(camara, 0, 0, camara.videoWidth, camara.videoHeight);
+    } else {
+      ctx.save();
+      ctx.fillStyle = colorFondo;
+      ctx.globalAlpha = opacidadFondo;
+      ctx.fillRect(0, 0, lienzo.width, lienzo.height);
+    }
 
+    ctx.restore();
     if (caras && caras.length > 0) {
       pintarCaras(caras);
     }
@@ -75,30 +112,29 @@ export default async () => {
   function pintarCaras(caras: Face[]) {
     if (!ctx) return;
 
-    caras.forEach((face) => {
-      const puntos = face.keypoints.map((keypoint) => [keypoint.x, keypoint.y]);
+    caras.forEach((cara) => {
+      const puntos = cara.keypoints.map(({ x, y }) => [x, y]);
 
       if (triangular) {
-        ctx.strokeStyle = GREEN;
-        ctx.lineWidth = 0.5;
+        ctx.strokeStyle = colorMalla;
+        ctx.lineWidth = grosorLineaMalla;
 
         for (let i = 0; i < TRIANGULACION.length / 3; i++) {
-          const points = [TRIANGULACION[i * 3], TRIANGULACION[i * 3 + 1], TRIANGULACION[i * 3 + 2]].map(
+          const puntosParteDelRostro = [TRIANGULACION[i * 3], TRIANGULACION[i * 3 + 1], TRIANGULACION[i * 3 + 2]].map(
             (index) => puntos[index]
           );
 
-          pintarForma(points, true);
+          pintarForma(puntosParteDelRostro, true);
         }
       } else {
-        ctx.fillStyle = GREEN;
-        const radio = 1;
+        ctx.fillStyle = colorPuntos;
 
         for (let i = 0; i < TOTAL_PUNTOS; i++) {
           const x = puntos[i][0];
           const y = puntos[i][1];
 
           ctx.beginPath();
-          ctx.arc(x, y, radio, 0, DOS_PI);
+          ctx.arc(x, y, radioPunto, 0, DOS_PI);
           ctx.fill();
         }
       }
@@ -111,14 +147,13 @@ export default async () => {
     if (!ctx || !camara) return;
     const videoWidth = camara.videoWidth;
     const videoHeight = camara.videoHeight;
-    // Must set below two lines, otherwise video element doesn't show.
     camara.width = videoWidth;
     camara.height = videoHeight;
 
     lienzo.width = videoWidth;
     lienzo.height = videoHeight;
 
-    // Because the image from camera is mirrored, need to flip horizontally.
+    // Flip camera image horizontally.
     ctx.translate(camara.videoWidth, 0);
     ctx.scale(-1, 1);
   }
@@ -129,8 +164,9 @@ export default async () => {
     const contornos = puntosCaras.util.getKeypointIndexByContour(puntosCaras.SupportedModels.MediaPipeFaceMesh);
 
     for (const [nombre, contorno] of Object.entries(contornos)) {
-      ctx.strokeStyle = COLORES[nombre];
-      ctx.lineWidth = 3;
+      const parte = partes[nombre];
+      ctx.strokeStyle = parte.color;
+      ctx.lineWidth = parte.ancho;
       const linea = contorno.map((index) => puntos[index]);
 
       if (linea.every((punto) => punto != undefined)) {

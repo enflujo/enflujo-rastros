@@ -25,3 +25,19 @@ export async function iniciarCamara(): Promise<HTMLVideoElement | null> {
     };
   });
 }
+
+export function escalarLienzo(lienzo: HTMLCanvasElement, ctx: CanvasRenderingContext2D, camara: HTMLVideoElement) {
+  if (!ctx || !camara) return;
+  const videoWidth = camara.videoWidth;
+  const videoHeight = camara.videoHeight;
+  // Must set below two lines, otherwise video element doesn't show.
+  camara.width = videoWidth;
+  camara.height = videoHeight;
+
+  lienzo.width = videoWidth;
+  lienzo.height = videoHeight;
+
+  // Because the image from camera is mirrored, need to flip horizontally.
+  ctx.translate(camara.videoWidth, 0);
+  ctx.scale(-1, 1);
+}

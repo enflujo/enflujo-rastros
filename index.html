@@ -35,8 +35,17 @@
     <!-- <meta name="twitter:image:alt" content="Texto que describe la imagen" /> -->
   </head>
   <body>
+    <div id="controles">
+      <input type="checkbox" name="face" id="face" checked />
+      <label for="faces">Face</label>
+
+      <input type="checkbox" name="voice" id="voice" checked />
+      <label for="voice">Voice</label>
+
+      <input type="checkbox" name="hands" id="hands" />
+      <label for="hands">Hands</label>
+    </div>
     <div id="contenedor">
-      <canvas id="lienzo"></canvas>
       <video id="camara"></video>
     </div>
 

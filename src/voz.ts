@@ -11,7 +11,8 @@ const config = {
       title: 'Web Speech API',
       value: 'webspeech',
     },
-    language: 'en-US',
+    // language: 'en-US',
+    language: 'es-MX',
     confidence: 0.9,
     sensitivity: 0.0,
   },
@@ -75,7 +76,9 @@ async function definirSensilidad() {
   window.requestAnimationFrame(instancia);
 }
 
-export default async function iniciar() {
+export default { prender, apagar };
+
+async function prender() {
   maquina.start();
 
   try {
@@ -137,3 +140,5 @@ function procesarResultado(transcripcion: string, yaTermino: boolean) {
 function fin() {
   maquina.start();
 }
+
+function apagar() {}

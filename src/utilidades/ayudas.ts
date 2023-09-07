@@ -34,10 +34,10 @@ export function escalarLienzo(lienzo: HTMLCanvasElement, ctx: CanvasRenderingCon
   camara.width = videoWidth;
   camara.height = videoHeight;
 
-  lienzo.width = videoWidth;
-  lienzo.height = videoHeight;
+  lienzo.width = window.innerWidth;
+  lienzo.height = window.innerHeight;
 
   // Because the image from camera is mirrored, need to flip horizontally.
-  ctx.translate(camara.videoWidth, 0);
+  ctx.translate(window.innerWidth, 0);
   ctx.scale(-1, 1);
 }

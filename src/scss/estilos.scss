@@ -42,7 +42,8 @@ video {
   height: 100vh;
 }
 
-#textoEnVivo {
+#textoEnVivo,
+.mensaje {
   font-size: 2em;
   position: fixed;
   opacity: 0.6;

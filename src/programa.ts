@@ -3,17 +3,18 @@ import voz from './voz';
 import iris from './iris';
 import caras from './caras';
 import type { OpcionesCara } from './iris';
+import manos from './manos';
 
 const vistas: { [nombre: string]: { prender: (config: any) => Promise<void>; apagar: () => void } } = {
   voice: voz,
   face: iris,
-  hands: caras,
+  hands: manos,
 };
 
 const opciones = document.querySelectorAll<HTMLInputElement>('#controles input');
 
 const faceConfig: OpcionesCara = {
-  background: { showVideo: false, color: '#1d1b1b', opacity: 0.01 },
+  background: { showVideo: false, color: '#1d1b1b', opacity: 0.8 },
   mesh: { show: true, width: 0.5, color: '#C0C0C070' },
   dots: { show: true, radius: 1.3, color: 'yellow' },
   rightEye: { show: false, width: 2, color: '#FF3030' },

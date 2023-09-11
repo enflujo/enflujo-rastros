@@ -1,20 +1,22 @@
 import './scss/estilos.scss';
-import voz from './voz';
+import Voz from './Voz';
 import Caras from './Caras';
 import Manos from './Manos';
 import { iniciarCamara } from './utilidades/ayudas';
 import { FilesetResolver } from '@mediapipe/tasks-vision';
-import type { OpcionesCara } from './tipos';
+import type { OpcionesCara, WasmFileset } from './tipos';
 import Vision from './Vision';
 
 type Programas = {
   caras: Caras;
   manos: Manos;
+  voz: Voz;
 };
 
-const programas = { caras: new Caras(), manos: new Manos() };
-
-const opciones = document.querySelectorAll<HTMLInputElement>('#controles input');
+const controlCara = document.getElementById('caras') as HTMLInputElement;
+const controlManos = document.getElementById('manos') as HTMLInputElement;
+const controlVoz = document.getElementById('voz') as HTMLInputElement;
+const programas: Programas = { caras: new Caras(), manos: new Manos(), voz: new Voz() };
 let reloj = -1;
 
 const faceConfig: OpcionesCara = {
@@ -32,30 +34,48 @@ const faceConfig: OpcionesCara = {
 };
 
 async function inicio() {
-  const camara = (await iniciarCamara()) as HTMLVideoElement;
+  const eventoCambioEstadoVision = async (activo: boolean, llave: keyof Programas) => {
+    const programa = programas[llave];
 
-  const vision = await FilesetResolver.forVisionTasks(
-    'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm'
-  );
-
-  if (!camara || !vision) return;
-
-  opciones.forEach((opcion) => {
-    const programa = programas[opcion.id as keyof Programas];
-
-    if (opcion.checked) {
-      activarPrograma(programa);
+    if (activo) {
+      await activarPrograma(programa);
+    } else {
+      programa.apagar();
+      programa.activo = false;
     }
+  };
 
-    opcion.onchange = () => {
-      if (opcion.checked) {
-        activarPrograma(programa);
-      } else {
-        programa.apagar();
-        programa.activo = false;
-      }
-    };
-  });
+  let camara: HTMLVideoElement;
+  let modeloVision: WasmFileset;
+
+  if (controlCara.checked) {
+    await activarPrograma(programas.caras);
+  }
+
+  if (controlManos.checked) {
+    await activarPrograma(programas.manos);
+  }
+
+  if (controlVoz.checked) {
+    await activarPrograma(programas.voz);
+  }
+
+  controlCara.onchange = async (evento: Event) => {
+    await eventoCambioEstadoVision((evento.target as HTMLInputElement).checked, 'caras');
+  };
+
+  controlManos.onchange = async (evento: Event) => {
+    await eventoCambioEstadoVision((evento.target as HTMLInputElement).checked, 'manos');
+  };
+
+  controlVoz.onchange = async (evento: Event) => {
+    if ((evento.target as HTMLInputElement).checked) {
+      await activarPrograma(programas.voz);
+    } else {
+      programas.voz.apagar();
+      programas.voz.activo = false;
+    }
+  };
 
   let ultimoFotograma = -1;
 
@@ -83,14 +103,28 @@ async function inicio() {
 
   ciclo();
 
-  function activarPrograma(programa: Caras | Manos) {
+  async function activarPrograma(programa: Caras | Manos | Voz) {
     if (programa instanceof Vision) {
+      if (!camara) {
+        camara = (await iniciarCamara()) as HTMLVideoElement;
+      }
+
+      if (!modeloVision) {
+        modeloVision = await FilesetResolver.forVisionTasks(
+          'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm'
+        );
+      }
+
+      if (!camara || !modeloVision) return;
+
       programa
         .prender(camara)
-        .cargarModelo(vision)
+        .cargarModelo(modeloVision)
         .then(() => {
           programa.activo = true;
         });
+    } else if (programa instanceof Voz) {
+      programa.prender();
     }
   }
 }

@@ -3,11 +3,9 @@ import type { OpcionesCara, WasmFileset } from './tipos';
 import Vision from './Vision';
 
 export default class Caras extends Vision {
-  modelo?: FaceLandmarker;
-
   constructor() {
     super();
-    this.lienzo.style.zIndex = '1';
+    // this.lienzo.style.zIndex = '1';
   }
 
   async cargarModelo(vision: WasmFileset) {
@@ -17,6 +15,9 @@ export default class Caras extends Vision {
       outputFaceBlendshapes: true,
       numFaces: 2,
     });
+
+    if (!this.lienzo) return;
+    this.lienzo.style.zIndex = '1';
   }
 
   detectar(camara: HTMLVideoElement, tiempoAhora: number) {
@@ -24,6 +25,8 @@ export default class Caras extends Vision {
   }
 
   pintar(puntos: NormalizedLandmark[][], configuracion: OpcionesCara) {
+    if (!this.ctx || !this.pintor || !this.lienzo) return;
+
     if (puntos) {
       const ctx = this.ctx;
       const pintor = this.pintor;

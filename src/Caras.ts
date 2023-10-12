@@ -21,6 +21,7 @@ export default class Caras extends Vision {
   }
 
   detectar(camara: HTMLVideoElement, tiempoAhora: number) {
+    if (!this.modelo) return;
     return (this.modelo as FaceLandmarker).detectForVideo(camara, tiempoAhora);
   }
 
@@ -125,35 +126,6 @@ export default class Caras extends Vision {
 
         // pintor.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_CONTOURS, { color: '#E0E0E0' });
       }
-
-      // drawBlendShapes(faceBlendshapes);
     }
   }
 }
-
-// async function prender() {
-//   const formas = document.createElement('ul');
-//   document.body.appendChild(formas);
-
-//   function drawBlendShapes(blendShapes: Classifications[]) {
-//     if (!blendShapes.length) {
-//       return;
-//     }
-
-//     // console.log(blendShapes[0]);
-
-//     let htmlMaker = '';
-//     blendShapes[0].categories.map((forma) => {
-//       htmlMaker += `
-//         <li class="blend-shapes-item">
-//           <span class="blend-shapes-label">${forma.displayName || forma.categoryName}</span>
-//           <span class="blend-shapes-value" style="width: calc(${+forma.score * 100}% - 120px)">${(+forma.score).toFixed(
-//             4
-//           )}</span>
-//         </li>
-//       `;
-//     });
-
-//     formas.innerHTML = htmlMaker;
-//   }
-// }

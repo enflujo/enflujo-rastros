@@ -3,20 +3,29 @@ import Voz from './Voz';
 import Caras from './Caras';
 import Manos from './Manos';
 import { iniciarCamara } from './utilidades/ayudas';
-import { FilesetResolver } from '@mediapipe/tasks-vision';
+import { FaceLandmarkerResult, FilesetResolver } from '@mediapipe/tasks-vision';
 import type { OpcionesCara, WasmFileset } from './tipos';
 import Vision from './Vision';
+import AnalisisCara from './AnalisisCaras';
 
 type Programas = {
   caras: Caras;
   manos: Manos;
   voz: Voz;
+  analisisCara: AnalisisCara;
 };
 
 const controlCara = document.getElementById('caras') as HTMLInputElement;
 const controlManos = document.getElementById('manos') as HTMLInputElement;
 const controlVoz = document.getElementById('voz') as HTMLInputElement;
-const programas: Programas = { caras: new Caras(), manos: new Manos(), voz: new Voz() };
+const controlAnalisisCara = document.getElementById('analisisCara') as HTMLInputElement;
+
+const programas: Programas = {
+  caras: new Caras(),
+  manos: new Manos(),
+  voz: new Voz(),
+  analisisCara: new AnalisisCara(),
+};
 let reloj = -1;
 
 const faceConfig: OpcionesCara = {
@@ -60,6 +69,10 @@ async function inicio() {
     await activarPrograma(programas.voz);
   }
 
+  if (controlAnalisisCara.checked) {
+    await activarPrograma(programas.analisisCara);
+  }
+
   controlCara.onchange = async (evento: Event) => {
     await eventoCambioEstadoVision((evento.target as HTMLInputElement).checked, 'caras');
   };
@@ -77,6 +90,14 @@ async function inicio() {
     }
   };
 
+  controlAnalisisCara.onchange = (evento: Event) => {
+    if ((evento.target as HTMLInputElement).checked) {
+      programas.analisisCara.prender();
+    } else {
+      programas.analisisCara.apagar();
+    }
+  };
+
   let ultimoFotograma = -1;
 
   function ciclo() {
@@ -84,10 +105,21 @@ async function inicio() {
 
     if (camara.currentTime !== ultimoFotograma) {
       ultimoFotograma = camara.currentTime;
+      let resultadoCaras: FaceLandmarkerResult | undefined;
 
       if (programas.caras.activo) {
-        const resultadoCaras = programas.caras.detectar(camara, tiempoAhora);
-        programas.caras.pintar(resultadoCaras.faceLandmarks, faceConfig);
+        resultadoCaras = programas.caras.detectar(camara, tiempoAhora);
+
+        if (resultadoCaras) programas.caras.pintar(resultadoCaras.faceLandmarks, faceConfig);
+      }
+
+      if (programas.analisisCara.activo) {
+        if (resultadoCaras) {
+          programas.analisisCara.pintar(resultadoCaras.faceBlendshapes);
+        } else {
+          resultadoCaras = programas.caras.detectar(camara, tiempoAhora);
+          if (resultadoCaras) programas.analisisCara.pintar(resultadoCaras.faceBlendshapes);
+        }
       }
 
       if (programas.manos.activo) {
@@ -103,7 +135,7 @@ async function inicio() {
 
   ciclo();
 
-  async function activarPrograma(programa: Caras | Manos | Voz) {
+  async function activarPrograma(programa: Caras | Manos | Voz | AnalisisCara) {
     if (programa instanceof Vision) {
       if (!camara) {
         camara = (await iniciarCamara()) as HTMLVideoElement;
@@ -124,6 +156,8 @@ async function inicio() {
           programa.activo = true;
         });
     } else if (programa instanceof Voz) {
+      programa.prender();
+    } else {
       programa.prender();
     }
   }

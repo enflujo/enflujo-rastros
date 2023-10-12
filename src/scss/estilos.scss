@@ -72,3 +72,43 @@ body {
   top: 0;
   z-index: 99999999;
 }
+
+#contenedorAnalisisCaras {
+  position: absolute;
+  color: white;
+  top: 0;
+  z-index: 9;
+  width: 30vw;
+
+  ul {
+    list-style: none;
+    font-size: 0.8em;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    width: 100%;
+    background-color: rgba(240, 248, 255, 0.171);
+    margin-bottom: 0.2em;
+    position: relative;
+
+    .barra {
+      background-color: rgba(255, 255, 0, 0.368);
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 1em;
+    }
+  }
+}
+
+#parpadeos {
+  position: fixed;
+  color: rgb(203, 236, 106);
+  font-size: 4em;
+  width: 100vw;
+  text-align: center;
+  z-index: 99;
+  top: 0;
+}

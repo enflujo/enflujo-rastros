@@ -28,7 +28,7 @@ export default class Vision {
     if (!this.lienzo) return;
     document.body.removeChild(this.lienzo);
     delete this.pintor;
-    delete this.lienzo;
-    delete this.modelo;
+    // delete this.lienzo;
+    // delete this.modelo;
   }
 }

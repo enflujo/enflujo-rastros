@@ -2,33 +2,20 @@
   "name": "enflujo-rastros",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
+  "workspaces": [
+    "aplicaciones/*"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite build && vite preview",
+    "dev": "yarn workspace www dev",
+    "build": "yarn borrar && yarn workspace www build && yarn workspace servidor build",
+    "preview": "yarn workspace www preview",
+    "borrar": "rimraf ./servidor",
+    "servidor": "yarn workspace servidor dev",
     "lint": "prettier --check .",
     "lint:fix": "prettier --write --list-different ."
   },
   "devDependencies": {
-    "@types/dom-speech-recognition": "^0.0.2",
-    "autoprefixer": "^10.4.16",
-    "cssnano": "^6.0.1",
-    "postcss": "^8.4.31",
     "prettier": "^3.0.3",
-    "sass": "^1.69.3",
-    "vite": "^4.4.11"
-  },
-  "dependencies": {
-    "@mediapipe/face_detection": "^0.4.1646425229",
-    "@mediapipe/face_mesh": "^0.4.1633559619",
-    "@mediapipe/tasks-vision": "^0.10.7",
-    "@tensorflow-models/face-detection": "^1.0.2",
-    "@tensorflow-models/face-landmarks-detection": "^1.0.5",
-    "@tensorflow/tfjs-backend-wasm": "^4.12.0-rc.0",
-    "@tensorflow/tfjs-backend-webgl": "^4.12.0-rc.0",
-    "@tensorflow/tfjs-converter": "^4.12.0-rc.0",
-    "@tensorflow/tfjs-core": "^4.11.0",
-    "polarity": "^4.0.1"
+    "rimraf": "^5.0.5"
   }
 }

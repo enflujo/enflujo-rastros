@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "es2016",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "outDir": "../../servidor",
+    "rootDir": "fuente",
+    "baseUrl": "./fuente",
+    "paths": {
+      "@/*": ["*"]
+    }
+  },
+  "include": ["./fuente/**/*"],
+  "exclude": ["node_modules"]
+}

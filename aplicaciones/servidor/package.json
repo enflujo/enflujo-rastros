@@ -1,0 +1,23 @@
+{
+  "name": "servidor",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon ./fuente/index.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@fastify/websocket": "^8.2.0",
+    "fastify": "^4.24.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.4",
+    "@types/uuid": "^9.0.5",
+    "@types/ws": "^8.5.7",
+    "nodemon": "^3.0.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  }
+}

@@ -19,6 +19,7 @@ const controlCara = document.getElementById('caras') as HTMLInputElement;
 const controlManos = document.getElementById('manos') as HTMLInputElement;
 const controlVoz = document.getElementById('voz') as HTMLInputElement;
 const controlAnalisisCara = document.getElementById('analisisCara') as HTMLInputElement;
+const contenedorParpadeo = document.getElementById('parpadeos');
 
 const programas: Programas = {
   caras: new Caras(),
@@ -162,5 +163,32 @@ async function inicio() {
     }
   }
 }
+
+
+function pintarRelaciones() {
+  // const cajaParpadeo = contenedorParpadeo?.getBoundingClientRect;
+   const contenedorTrazo =  document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+   const trazo = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+
+ //   if(cajaParpadeo) {
+ //   trazo.setAttribute(
+ //     'd',
+ //     `M ${cajaLogo.right} ${cajaLogo.top + cajaLogo.height / 2} C ${cajaLogo.right} ${cajaGeneral.bottom + 200}, ${
+ //       cajaGeneral.right * 0.9
+ //     } ${cajaParpadeo.top}, ${cajaParpadeo?.right}, ${cajaParpadeo.bottom} `
+ //   );
+ // }
+
+
+ trazo.setAttribute('d', 'M 70 110 C 70 140, 110 140, 110 110');
+   trazo.setAttribute('stroke', '#5757f7');
+   trazo.setAttribute('stroke-width', '5px');
+   trazo.setAttribute('fill', 'transparent');
+
+   contenedorTrazo.appendChild(trazo)
+   document.body.appendChild(contenedorTrazo)
+   
+
+ }
 
 inicio();

@@ -107,8 +107,16 @@ body {
   position: fixed;
   color: rgb(203, 236, 106);
   font-size: 4em;
-  width: 100vw;
+  width: fit-content;
   text-align: center;
   z-index: 99;
   top: 0;
+  left: 45vw;
+}
+
+.contenedorTrazo {
+  position: absolute;
+  z-index: 9;
+  width: 100vw;
+  height: 100vh;
 }

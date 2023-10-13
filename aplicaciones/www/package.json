@@ -10,6 +10,7 @@
   },
   "devDependencies": {
     "@types/dom-speech-recognition": "^0.0.2",
+    "@types/simple-peer": "^9.11.6",
     "autoprefixer": "^10.4.16",
     "cssnano": "^6.0.1",
     "postcss": "^8.4.31",
@@ -26,6 +27,7 @@
     "@tensorflow/tfjs-backend-webgl": "^4.12.0-rc.0",
     "@tensorflow/tfjs-converter": "^4.12.0-rc.0",
     "@tensorflow/tfjs-core": "^4.11.0",
-    "polarity": "^4.0.1"
+    "polarity": "^4.0.1",
+    "simple-peer": "^9.11.1"
   }
 }

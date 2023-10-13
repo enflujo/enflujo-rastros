@@ -16,7 +16,8 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["fuente/*"]
+      "@/*": ["fuente/*"],
+      "@/tipos/*": ["../../tipos/*"]
     }
   },
   "include": ["./fuente/**/*"]

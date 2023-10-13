@@ -4,7 +4,7 @@ import Caras from '@/componentes/Caras';
 import Manos from '@/componentes/Manos';
 import { iniciarCamara } from '@/utilidades/ayudas';
 import { FaceLandmarkerResult, FilesetResolver } from '@mediapipe/tasks-vision';
-import type { OpcionesCara, WasmFileset } from '@/tipos';
+import type { OpcionesCara, WasmFileset } from '@/tipos/www';
 import Vision from '@/componentes/Vision';
 import AnalisisCara from '@/componentes/AnalisisCaras';
 import Comunicacion from '@/componentes/Comunicacion';
@@ -16,7 +16,7 @@ type Programas = {
   analisisCara: AnalisisCara;
 };
 
-const com = new Comunicacion();
+const com = new Comunicacion('receptor');
 
 const controlCara = document.getElementById('caras') as HTMLInputElement;
 const controlManos = document.getElementById('manos') as HTMLInputElement;

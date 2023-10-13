@@ -2,8 +2,8 @@
 
 import { HandLandmarker } from '@mediapipe/tasks-vision';
 import type { NormalizedLandmark } from '@mediapipe/tasks-vision';
-import type { WasmFileset } from './tipos';
-import Vision from './Vision';
+import type { WasmFileset } from '@/tipos';
+import Vision from '@/componentes/Vision';
 
 export default class Manos extends Vision {
   constructor() {

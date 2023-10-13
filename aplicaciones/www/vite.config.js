@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
+import { fileURLToPath } from 'url';
 
 export default defineConfig({
   // base: '/',
@@ -7,6 +8,11 @@ export default defineConfig({
     port: 3000,
   },
   publicDir: 'estaticos',
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./fuente', import.meta.url)),
+    },
+  },
   build: {
     outDir: '../../publico',
     assetsDir: 'recursos',

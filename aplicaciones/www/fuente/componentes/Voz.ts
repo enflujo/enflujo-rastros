@@ -1,4 +1,4 @@
-import sentimientoVoz from './utilidades/sentimientoVoz';
+import sentimientoVoz from '@/utilidades/sentimientoVoz';
 
 const Reconocimiento = window.SpeechRecognition || window.webkitSpeechRecognition;
 const Gramatica = window.SpeechGrammarList || window.webkitSpeechGrammarList;

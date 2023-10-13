@@ -1,6 +1,6 @@
 import { DrawingUtils } from '@mediapipe/tasks-vision';
 import type { FaceLandmarker, HandLandmarker } from '@mediapipe/tasks-vision';
-import { escalarLienzo } from './utilidades/ayudas';
+import { escalarLienzo } from '@/utilidades/ayudas';
 
 export default class Vision {
   lienzo?: HTMLCanvasElement;

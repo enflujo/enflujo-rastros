@@ -1,13 +1,13 @@
-import './scss/estilos.scss';
-import Voz from './Voz';
-import Caras from './Caras';
-import Manos from './Manos';
-import { iniciarCamara } from './utilidades/ayudas';
+import '@/scss/estilos.scss';
+import Voz from '@/componentes/Voz';
+import Caras from '@/componentes/Caras';
+import Manos from '@/componentes/Manos';
+import { iniciarCamara } from '@/utilidades/ayudas';
 import { FaceLandmarkerResult, FilesetResolver } from '@mediapipe/tasks-vision';
-import type { OpcionesCara, WasmFileset } from './tipos';
-import Vision from './Vision';
-import AnalisisCara from './AnalisisCaras';
-import Comunicacion from './componentes/Comunicacion';
+import type { OpcionesCara, WasmFileset } from '@/tipos';
+import Vision from '@/componentes/Vision';
+import AnalisisCara from '@/componentes/AnalisisCaras';
+import Comunicacion from '@/componentes/Comunicacion';
 
 type Programas = {
   caras: Caras;
@@ -15,6 +15,7 @@ type Programas = {
   voz: Voz;
   analisisCara: AnalisisCara;
 };
+
 const com = new Comunicacion();
 
 const controlCara = document.getElementById('caras') as HTMLInputElement;
@@ -28,6 +29,7 @@ const programas: Programas = {
   voz: new Voz(),
   analisisCara: new AnalisisCara(),
 };
+
 let reloj = -1;
 
 const faceConfig: OpcionesCara = {

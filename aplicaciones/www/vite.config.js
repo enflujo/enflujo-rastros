@@ -11,6 +11,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./fuente', import.meta.url)),
+      'simple-peer': 'simple-peer/simplepeer.min.js',
     },
   },
   build: {

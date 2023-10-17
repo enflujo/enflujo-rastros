@@ -1,5 +1,5 @@
 import { FaceLandmarker, NormalizedLandmark } from '@mediapipe/tasks-vision';
-import type { OpcionesCara, WasmFileset } from '@/tipos';
+import type { OpcionesCara, WasmFileset } from '@/tipos/www';
 import Vision from '@/componentes/Vision';
 
 export default class Caras extends Vision {

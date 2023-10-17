@@ -1,3 +1,5 @@
+import { Acciones } from './compartidos';
+
 export interface WasmFileset {
   /** The path to the Wasm loader script. */
   wasmLoaderPath: string;

@@ -20,5 +20,5 @@
       "@/tipos/*": ["../../tipos/*"]
     }
   },
-  "include": ["./fuente/**/*"]
+  "include": ["./fuente/**/*", "../../tipos/**/*"]
 }

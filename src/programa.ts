@@ -26,21 +26,21 @@ const programas: Programas = {
   voz: new Voz(),
   analisisCara: new AnalisisCara(),
 };
-let reloj = -1;
+// let reloj = -1;
 
-const faceConfig: OpcionesCara = {
-  background: { showVideo: false, color: '#1d1b1b', opacity: 1 },
-  mesh: { show: true, width: 0.5, color: '#C0C0C070' },
-  dots: { show: true, radius: 1.3, color: 'yellow' },
-  rightEye: { show: false, width: 2, color: '#FF3030' },
-  rightEyebrow: { show: false, width: 2, color: '#FF3030' },
-  rightIris: { show: false, width: 2, color: '#FF3030' },
-  leftEye: { show: false, width: 2, color: '#30FF30' },
-  leftEyebrow: { show: false, width: 2, color: '#30FF30' },
-  leftIris: { show: false, width: 2, color: '#30FF30' },
-  lips: { show: false, width: 2, color: '#E0E0E0' },
-  faceOval: { show: false, width: 2, color: '#E0E0E0' },
-};
+// const faceConfig: OpcionesCara = {
+//   background: { showVideo: false, color: '#1d1b1b', opacity: 1 },
+//   mesh: { show: true, width: 0.5, color: '#C0C0C070' },
+//   dots: { show: true, radius: 1.3, color: 'yellow' },
+//   rightEye: { show: false, width: 2, color: '#FF3030' },
+//   rightEyebrow: { show: false, width: 2, color: '#FF3030' },
+//   rightIris: { show: false, width: 2, color: '#FF3030' },
+//   leftEye: { show: false, width: 2, color: '#30FF30' },
+//   leftEyebrow: { show: false, width: 2, color: '#30FF30' },
+//   leftIris: { show: false, width: 2, color: '#30FF30' },
+//   lips: { show: false, width: 2, color: '#E0E0E0' },
+//   faceOval: { show: false, width: 2, color: '#E0E0E0' },
+// };
 
 async function inicio() {
   const eventoCambioEstadoVision = async (activo: boolean, llave: keyof Programas) => {
@@ -98,42 +98,42 @@ async function inicio() {
     }
   };
 
-  let ultimoFotograma = -1;
+  // let ultimoFotograma = -1;
 
-  function ciclo() {
-    const tiempoAhora = performance.now();
+  // function ciclo() {
+  //   const tiempoAhora = performance.now();
 
-    if (camara.currentTime !== ultimoFotograma) {
-      ultimoFotograma = camara.currentTime;
-      let resultadoCaras: FaceLandmarkerResult | undefined;
+  //   if (camara.currentTime !== ultimoFotograma) {
+  //     ultimoFotograma = camara.currentTime;
+  //     let resultadoCaras: FaceLandmarkerResult | undefined;
 
-      if (programas.caras.activo) {
-        resultadoCaras = programas.caras.detectar(camara, tiempoAhora);
+  //     if (programas.caras.activo) {
+  //       resultadoCaras = programas.caras.detectar(camara, tiempoAhora);
 
-        if (resultadoCaras) programas.caras.pintar(resultadoCaras.faceLandmarks, faceConfig);
-      }
+  //       if (resultadoCaras) programas.caras.pintar(resultadoCaras.faceLandmarks, faceConfig);
+  //     }
 
-      if (programas.analisisCara.activo) {
-        if (resultadoCaras) {
-          programas.analisisCara.pintar(resultadoCaras.faceBlendshapes);
-        } else {
-          resultadoCaras = programas.caras.detectar(camara, tiempoAhora);
-          if (resultadoCaras) programas.analisisCara.pintar(resultadoCaras.faceBlendshapes);
-        }
-      }
+  //     if (programas.analisisCara.activo) {
+  //       if (resultadoCaras) {
+  //         programas.analisisCara.pintar(resultadoCaras.faceBlendshapes);
+  //       } else {
+  //         resultadoCaras = programas.caras.detectar(camara, tiempoAhora);
+  //         if (resultadoCaras) programas.analisisCara.pintar(resultadoCaras.faceBlendshapes);
+  //       }
+  //     }
 
-      if (programas.manos.activo) {
-        const resultadoManos = programas.manos.detectar(camara, tiempoAhora);
-        programas.manos.pintar(resultadoManos.landmarks);
-      }
+  //     if (programas.manos.activo) {
+  //       const resultadoManos = programas.manos.detectar(camara, tiempoAhora);
+  //       programas.manos.pintar(resultadoManos.landmarks);
+  //     }
 
-      // const { faceLandmarks, faceBlendshapes } = cara.detectForVideo(camara, tiempoAhora);
-    }
+  //     // const { faceLandmarks, faceBlendshapes } = cara.detectForVideo(camara, tiempoAhora);
+  //   }
 
-    reloj = requestAnimationFrame(ciclo);
-  }
+  //   reloj = requestAnimationFrame(ciclo);
+  // }
 
-  ciclo();
+  // ciclo();
 
   async function activarPrograma(programa: Caras | Manos | Voz | AnalisisCara) {
     if (programa instanceof Vision) {

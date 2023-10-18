@@ -18,12 +18,19 @@ export default class Voz {
   sensibilidadMax: number;
   hablando: boolean;
   reloj: number;
+  lienzo?: HTMLCanvasElement;
+  ctxDibujo?: CanvasRenderingContext2D;
+  sentimiento: {polarity: number, positivity: number, negativity: number, positive: string[], negative: string[]};
+  polaridad: number;
+  
 
   constructor() {
     this.activo = false;
     this.sensibilidadMax = 0;
     this.hablando = false;
     this.reloj = 0;
+    this.sentimiento = {polarity: 0, positivity: 0, negativity: 0, positive: [], negative: []};
+    this.polaridad = 0;
 
     try {
       this.maquina = new Reconocimiento();
@@ -40,6 +47,10 @@ export default class Voz {
     console.log('prendiendo');
     this.textoEnVivo = document.createElement('div');
     this.archivo = document.createElement('div');
+    this.lienzo = document.createElement('canvas');
+    this.ctxDibujo = this.lienzo.getContext('2d') as CanvasRenderingContext2D;
+    this.lienzo.className = 'lienzoVoz';
+    document.body.appendChild(this.lienzo);
 
     this.textoEnVivo.id = 'textoEnVivo';
     this.archivo.id = 'archivo';
@@ -104,6 +115,9 @@ export default class Voz {
     this.reloj = 0;
 
     window.cancelAnimationFrame(this.reloj);
+
+    if (!this.lienzo) return;
+    document.body.removeChild(this.lienzo);
   }
 
   detener() {
@@ -123,10 +137,16 @@ export default class Voz {
       const frase = document.createElement('p');
       const sentimiento = sentimientoVoz(transcripcion);
 
+      this.sentimiento = sentimiento;
+      this.sentimiento.polarity += sentimiento.polarity
+      console.log(this.sentimiento.polarity);
+
       frase.innerText = `${transcripcion} (sentiment: ${JSON.stringify(sentimiento, null, 2)})`;
       this.archivo.appendChild(frase);
       // archivo.scroll();
     }
+
+    this.pintar();
   }
 
   async definirSensilidad() {
@@ -155,4 +175,25 @@ export default class Voz {
 
     this.reloj = window.requestAnimationFrame(instancia.bind(this));
   }
+
+  pintar() {
+    if (this.ctxDibujo && this.lienzo) {
+ 
+        // Start a new Path
+        this.ctxDibujo.beginPath();
+        this.ctxDibujo.moveTo(200, 200);
+        this.trazarLinea(this.sentimiento.positivity, 10);
+
+        console.log(this.sentimiento.polarity)
+
+        // Draw the Path
+        this.ctxDibujo.strokeStyle = `rgba(255, ${this.sentimiento.negativity*10}, ${this.sentimiento.positivity*10}, 0.5)`;
+        this.ctxDibujo.stroke();
+    }
+  }
+ 
+  trazarLinea(x:number, y:number) {
+    this.ctxDibujo?.lineTo(x, y);
+  }
+
 }

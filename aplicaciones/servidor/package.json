@@ -5,8 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "nodemon ./fuente/index.ts",
-    "build": "tsc",
-    "preview": "nodemon ../../servidor/aplicaciones/servidor/fuente/index.js"
+    "build": "tsc"
   },
   "dependencies": {
     "@fastify/websocket": "^8.2.0",

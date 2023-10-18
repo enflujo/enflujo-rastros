@@ -1,8 +1,3 @@
-import type Caras from '@/componentes/Caras';
-import type Manos from '@/componentes/Manos';
-import type Voz from '@/componentes/Voz';
-import type AnalisisCara from '@/componentes/AnalisisCaras';
-
 export interface WasmFileset {
   /** The path to the Wasm loader script. */
   wasmLoaderPath: string;
@@ -40,10 +35,3 @@ interface ParametrosLineas extends ParametrosBase {
 interface ParametrosPuntos extends ParametrosBase {
   radius?: number;
 }
-
-export type Programas = {
-  caras: Caras;
-  manos: Manos;
-  voz: Voz;
-  analisisCara: AnalisisCara;
-};

@@ -3,7 +3,7 @@ import '@/scss/maquina.scss';
 import { FilesetResolver } from '@mediapipe/tasks-vision';
 import Comunicacion from '@/componentes/Comunicacion';
 import { escalarVideo, iniciarCamara } from './utilidades/ayudas';
-import type { Programas, WasmFileset } from '@/tipos/www';
+import type { WasmFileset } from '@/tipos/www';
 import { Acciones } from '@/tipos/compartidos';
 import Caras from '@/componentes/Caras';
 import Manos from '@/componentes/Manos';
@@ -21,6 +21,13 @@ let modeloVision: WasmFileset;
 // document.body.appendChild(lienzo);
 // lienzo.width = 320;
 // lienzo.height = 180;
+
+type Programas = {
+  caras: Caras;
+  manos: Manos;
+  voz: Voz;
+  analisisCara: AnalisisCara;
+};
 
 const programas: Programas = {
   caras: new Caras(),

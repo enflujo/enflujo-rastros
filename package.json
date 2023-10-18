@@ -2,20 +2,21 @@
   "name": "enflujo-rastros",
   "private": true,
   "version": "0.0.0",
+  "type": "module",
   "workspaces": [
     "aplicaciones/*"
   ],
   "scripts": {
     "dev": "yarn workspace www dev",
-    "build": "yarn borrar && yarn workspace www build && yarn workspace servidor build",
+    "build": "yarn borrar && yarn workspace www build && node conjuro.js",
     "preview": "yarn workspace www preview",
-    "probar": "yarn workspace servidor preview",
     "borrar": "rimraf ./servidor",
     "servidor": "yarn workspace servidor dev",
     "lint": "prettier --check .",
     "lint:fix": "prettier --write --list-different ."
   },
   "devDependencies": {
+    "esbuild": "^0.19.5",
     "prettier": "^3.0.3",
     "rimraf": "^5.0.5"
   }

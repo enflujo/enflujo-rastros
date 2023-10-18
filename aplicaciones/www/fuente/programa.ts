@@ -1,7 +1,7 @@
 import '@/scss/estilos.scss';
 import Comunicacion from '@/componentes/Comunicacion';
 import type { Acciones } from '@/tipos/compartidos';
-import type { OpcionesCara, Programas } from '@/tipos/www';
+import type { OpcionesCara } from '@/tipos/www';
 import Caras from '@/componentes/Caras';
 import Manos from '@/componentes/Manos';
 import Voz from '@/componentes/Voz';
@@ -14,6 +14,13 @@ import AnalisisCara from '@/componentes/AnalisisCaras';
 // import type { OpcionesCara, Programas, WasmFileset } from '@/tipos/www';
 // import Vision from '@/componentes/Vision';
 // import AnalisisCara from '@/componentes/AnalisisCaras';
+
+type Programas = {
+  caras: Caras;
+  manos: Manos;
+  voz: Voz;
+  analisisCara: AnalisisCara;
+};
 
 const faceConfig: OpcionesCara = {
   background: { showVideo: false, color: '#1d1b1b', opacity: 1 },

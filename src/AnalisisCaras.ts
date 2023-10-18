@@ -2,11 +2,15 @@ import type { Classifications } from '@mediapipe/tasks-vision';
 
 let contenedor: HTMLDivElement;
 let categorias: { contenedor: HTMLLIElement; barra: HTMLSpanElement; nombre: HTMLSpanElement }[] = [];
-const contenedorParpadeos = document.createElement('div');
+const contenedorParpadeos: HTMLDivElement = document.createElement('div');
+const contenedorBesito: HTMLDivElement = document.createElement('div'); 
 contenedorParpadeos.setAttribute('id', 'parpadeos');
 contenedorParpadeos.innerText = '0';
+contenedorBesito.setAttribute('id', 'besito');
+
 let parpadeos = 0;
 let parpadeando = false;
+let besando = false;
 
 export default class AnalisisCara {
   activo: boolean;
@@ -38,11 +42,14 @@ export default class AnalisisCara {
     contenedor.appendChild(formas);
 
     document.body.appendChild(contenedorParpadeos);
+    document.body.appendChild(contenedorBesito);
     document.body.appendChild(contenedor);
   }
 
   apagar() {
     document.body.removeChild(contenedor);
+    document.body.removeChild(contenedorBesito);
+
     categorias = [];
     this.activo = false;
   }
@@ -66,6 +73,41 @@ export default class AnalisisCara {
           contenedorParpadeos.innerText = `Blinked ${parpadeos} times.`;
         }
       }
+
+      if (categoria.categoryName === 'mouthPucker') {
+
+        if (!besando && categoria.score >= 0.8) {
+         
+          // besando = true;
+
+          // setTimeout(() => {
+          //   besando = false;
+          // }, 300);
+
+          contenedorBesito.innerText = 'Kiss me';
+         
+          
+        }
+
+        else {
+          contenedorBesito.innerText = '';
+        }
+      }
+
+      if(categoria.categoryName === 'mouthRight' && categoria.score >= 0.3) {
+      contenedorBesito.style.left = `${50 + (Math.random() * 20)}vw`;
+      contenedorBesito.style.top = `${50 + (Math.random() * 20)}vh`;
+      }
+
+
+      if(categoria.categoryName === 'mouthLeft' && categoria.score >= 0.3) {
+        contenedorBesito.style.left = `${50 - (Math.random() * 20)}vw`;
+        contenedorBesito.style.top = `${50 - (Math.random() * 20)}vh`;
+      }
+
+      
+
+
     });
   }
 }

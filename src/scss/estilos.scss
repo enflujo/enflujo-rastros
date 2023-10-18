@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Martian+Mono:wght@100..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Martian+Mono:wght@100&display=swap');
+
 html {
   box-sizing: border-box;
   height: 100%;
@@ -111,4 +114,14 @@ body {
   text-align: center;
   z-index: 99;
   top: 0;
+}
+
+#besito {
+  color: rgba(255, 130, 203, 0.5);
+  z-index: 99;
+  position: relative;
+  left: 50vw;
+  top: 60vh;
+  font-family: 'Martian Mono', monospace;
+  font-size: 4em;
 }

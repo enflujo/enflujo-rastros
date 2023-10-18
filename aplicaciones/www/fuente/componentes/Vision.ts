@@ -13,14 +13,14 @@ export default class Vision {
     this.activo = false;
   }
 
-  prender(camara: HTMLVideoElement) {
+  prender() {
     this.lienzo = document.createElement('canvas');
     this.ctx = this.lienzo.getContext('2d') as CanvasRenderingContext2D;
     if (!this.pintor) this.pintor = new DrawingUtils(this.ctx);
     this.lienzo.className = 'lienzo';
 
     document.body.appendChild(this.lienzo);
-    escalarLienzo(this.lienzo, this.ctx, camara);
+    escalarLienzo(this.lienzo, this.ctx);
     return this;
   }
 

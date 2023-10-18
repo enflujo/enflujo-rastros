@@ -2,7 +2,7 @@
 
 import { HandLandmarker } from '@mediapipe/tasks-vision';
 import type { NormalizedLandmark } from '@mediapipe/tasks-vision';
-import type { WasmFileset } from '@/tipos';
+import type { WasmFileset } from '@/tipos/www';
 import Vision from '@/componentes/Vision';
 
 export default class Manos extends Vision {
@@ -19,7 +19,9 @@ export default class Manos extends Vision {
       runningMode: 'VIDEO',
       numHands: 4,
     });
+  }
 
+  configurar() {
     if (!this.ctx || !this.lienzo) return;
     this.ctx.globalAlpha = 0.05;
     this.lienzo.style.zIndex = '2';

@@ -13,7 +13,7 @@ export default class Caras extends Vision {
       baseOptions: { modelAssetPath: '/modelos/face_landmarker.task', delegate: 'GPU' },
       runningMode: 'VIDEO',
       outputFaceBlendshapes: true,
-      numFaces: 2,
+      numFaces: 1,
     });
 
     if (!this.lienzo) return;

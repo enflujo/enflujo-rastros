@@ -24,6 +24,10 @@ export default class Voz {
     this.sensibilidadMax = 0;
     this.hablando = false;
     this.reloj = 0;
+  }
+
+  async cargarModelo() {
+    this.ctx = new AudioContext();
 
     try {
       this.maquina = new Reconocimiento();
@@ -31,6 +35,36 @@ export default class Voz {
       this.maquina.lang = 'en-US'; //'es-CO';
       this.maquina.interimResults = true;
       this.maquina.maxAlternatives = 1;
+      this.maquina.start();
+      await this.definirSensilidad();
+
+      this.maquina.onend = () => {
+        this.maquina?.start();
+      };
+
+      this.maquina.onresult = (evento) => {
+        if (this.sensibilidadMax < 0) return;
+
+        const resultado = evento.results[evento.results.length - 1];
+
+        if (resultado.isFinal) {
+          this.hablando = false;
+          this.detener();
+          this.sensibilidadMax = 0.0;
+          this.procesarResultado(resultado[0].transcript, resultado.isFinal);
+        } else if (!resultado.isFinal && !this.hablando) {
+          this.hablando = true;
+        }
+
+        if (!resultado.isFinal && this.hablando) {
+          let transcripcion = '';
+          Object.keys(evento.results).forEach((llave) => {
+            transcripcion += evento.results[+llave][0].transcript;
+          });
+
+          this.procesarResultado(transcripcion, resultado.isFinal);
+        }
+      };
     } catch (error) {
       console.error(error);
     }
@@ -46,62 +80,24 @@ export default class Voz {
     document.body.appendChild(this.archivo);
     document.body.appendChild(this.textoEnVivo);
 
-    this.ctx = new AudioContext();
-
-    if (!this.maquina) return;
-
-    this.maquina.start();
-
-    try {
-      await this.definirSensilidad();
-    } catch {}
-
-    this.maquina.onresult = (evento) => {
-      if (this.sensibilidadMax < 0) return;
-
-      const resultado = evento.results[evento.results.length - 1];
-
-      if (resultado.isFinal) {
-        this.hablando = false;
-        this.detener();
-        this.sensibilidadMax = 0.0;
-        this.procesarResultado(resultado[0].transcript, resultado.isFinal);
-      } else if (!resultado.isFinal && !this.hablando) {
-        this.hablando = true;
-      }
-
-      if (!resultado.isFinal && this.hablando) {
-        let transcripcion = '';
-        Object.keys(evento.results).forEach((llave) => {
-          transcripcion += evento.results[+llave][0].transcript;
-        });
-
-        this.procesarResultado(transcripcion, resultado.isFinal);
-      }
-    };
-
-    this.maquina.onend = () => {
-      this.maquina?.start();
-    };
-
     return this;
   }
 
-  apagar() {
+  apagarModelo() {
     this.detener();
-
-    if (this.textoEnVivo) document.body.removeChild(this.textoEnVivo);
-    if (this.archivo) document.body.removeChild(this.archivo);
-
     delete this.ctx;
     delete this.flujo;
+    window.cancelAnimationFrame(this.reloj);
+  }
+
+  apagar() {
+    if (this.textoEnVivo) document.body.removeChild(this.textoEnVivo);
+    if (this.archivo) document.body.removeChild(this.archivo);
 
     this.activo = false;
     this.sensibilidadMax = 0;
     this.hablando = false;
     this.reloj = 0;
-
-    window.cancelAnimationFrame(this.reloj);
   }
 
   detener() {

@@ -35,25 +35,33 @@
     <!-- <meta name="twitter:image:alt" content="Texto que describe la imagen" /> -->
   </head>
   <body>
-    <div id="controles">
-      <h2>Faces</h2>
-      <input type="checkbox" name="caras" id="caras" checked />
-      <label for="caras">active</label>
-
-      <h2>Face Analisis</h2>
-      <input type="checkbox" name="analisisCara" id="analisisCara" checked />
-      <label for="analisisCara">active</label>
-
-      <h2>Voice</h2>
-      <input type="checkbox" name="voz" id="voz" checked />
-      <label for="voz">activate</label>
-
-      <h2>Hands</h2>
-      <input type="checkbox" name="manos" id="manos" checked />
-      <label for="manos">active</label>
+    <div id="menu">
+      <span class="linea"></span>
     </div>
 
-    <video id="camara"></video>
+    <div id="controles">
+      <div class="modelo">
+        <input type="checkbox" name="caras" id="caras" checked />
+        <label for="caras">Faces</label>
+      </div>
+
+      <div class="modelo">
+        <input type="checkbox" name="analisisCara" id="analisisCara" checked />
+        <label for="analisisCara">Face Analisis</label>
+      </div>
+
+      <div class="modelo">
+        <input type="checkbox" name="voz" id="voz" checked />
+        <label for="voz">Voice</label>
+      </div>
+
+      <div class="modelo">
+        <input type="checkbox" name="manos" id="manos" checked />
+        <label for="manos">Hands</label>
+      </div>
+    </div>
+
+    <div id="estado"></div>
 
     <script type="module" src="/fuente/programa.ts"></script>
   </body>

@@ -1,5 +1,57 @@
 @import './normalizar';
 
 body {
-  background-color: rgb(24, 68, 71);
+  background-color: rgb(58, 66, 67);
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+}
+
+video {
+  display: none;
+}
+
+#estado {
+  padding: 1em;
+}
+
+#transmitiendo {
+  .bombillo {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    background-color: #c9c9c9;
+    border-radius: 50%;
+  }
+
+  &.prendido {
+    .bombillo {
+      background-color: #5ce465;
+      animation: palpito 0.8s infinite;
+    }
+  }
+
+  &.iniciando {
+    .bombillo {
+      background-color: #e4895c;
+      animation: palpito 0.5s infinite;
+    }
+  }
+
+  #mensajeEstado {
+    color: white;
+    font-size: 0.75em;
+  }
+}
+
+@keyframes palpito {
+  0% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 0.9;
+  }
+
+  100% {
+    opacity: 0.6;
+  }
 }

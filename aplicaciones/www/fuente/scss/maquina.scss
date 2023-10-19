@@ -2,15 +2,28 @@
 
 body {
   background-color: rgb(58, 66, 67);
-  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
 }
 
 video {
-  display: none;
+  // display: none;
+  width: 40vw;
+  height: auto;
+  transform: scaleX(-1);
 }
 
 #estado {
   padding: 1em;
+  color: white;
+  font-size: 0.7em;
+  display: flex;
+
+  .seccionEstado {
+    margin-left: 1em;
+  }
+
+  #conteoAmigos {
+    color: #e4895c;
+  }
 }
 
 #transmitiendo {
@@ -34,11 +47,6 @@ video {
       background-color: #e4895c;
       animation: palpito 0.5s infinite;
     }
-  }
-
-  #mensajeEstado {
-    color: white;
-    font-size: 0.75em;
   }
 }
 

@@ -12,15 +12,9 @@ import AnalisisCara from '@/componentes/AnalisisCaras';
 import Vision from '@/componentes/Vision';
 
 const com = new Comunicacion('transmisor');
-let reloj = -1;
-let ultimoFotograma = -1;
 let camara: HTMLVideoElement;
 let modeloVision: WasmFileset;
-// const lienzo = document.createElement('canvas');
-// const ctx = lienzo.getContext('2d');
-// document.body.appendChild(lienzo);
-// lienzo.width = 320;
-// lienzo.height = 180;
+let reloj = -1;
 
 type Programas = {
   caras: Caras;
@@ -38,6 +32,7 @@ const programas: Programas = {
 
 const mensajeEstado = document.getElementById('mensajeEstado') as HTMLSpanElement;
 const estadoTransmitiendo = document.getElementById('transmitiendo') as HTMLDivElement;
+const conteoAmigos = document.getElementById('conteoAmigos') as HTMLDivElement;
 
 document.body.addEventListener('enflujo', (evento: CustomEventInit) => {
   switch (evento.detail.tipo as Acciones) {
@@ -55,6 +50,19 @@ document.body.addEventListener('enflujo', (evento: CustomEventInit) => {
     case 'yaExisteTransmisor':
       mensajeEstado.innerText = `Sorry, there is already someone transmitting.`;
       break;
+    case 'conectadoConTransmisor':
+      console.log('conectado con transmisor');
+      if (camara) {
+        // Por alguna razón tenemos que cancelar el ciclo acá porque sino se detiene solo y nunca vuelve a revisar.
+        if (reloj >= 0) camara.cancelVideoFrameCallback(reloj);
+
+        reloj = camara.requestVideoFrameCallback(ciclo);
+      }
+
+      break;
+    case 'amigosConectados':
+      conteoAmigos.innerText = `${com.numeroAmigos}`;
+      break;
     default:
       break;
   }
@@ -66,27 +74,19 @@ async function inicio() {
   await activarPrograma(programas.voz);
   await activarPrograma(programas.analisisCara);
 
-  ciclo();
   estadoTransmitiendo.className = 'prendido';
   mensajeEstado.innerText = `..:: Transmitting ::..`;
+  reloj = camara.requestVideoFrameCallback(ciclo);
 }
 
-function ciclo() {
-  if (!Object.keys(com.amigos).length) {
-    reloj = requestAnimationFrame(ciclo);
-    return;
-  }
-  // ctx?.drawImage(camara, 0, 0);
-  const tiempoAhora = performance.now();
-
-  if (camara.currentTime !== ultimoFotograma) {
-    ultimoFotograma = camara.currentTime;
-
-    const resultadoCaras = programas.caras.detectar(camara, tiempoAhora);
-    const resultadoManos = programas.manos.detectar(camara, tiempoAhora);
+function ciclo(ahora: number) {
+  if (com.tieneAmigos) {
+    const resultadoCaras = programas.caras.detectar(camara, ahora);
+    const resultadoManos = programas.manos.detectar(camara, ahora);
 
     for (const id in com.amigos) {
       const amigo = com.amigos[id];
+      if (!amigo.canal.connected) return;
 
       if (resultadoCaras) {
         amigo.canal.send(JSON.stringify({ caras: resultadoCaras.faceLandmarks }));
@@ -98,7 +98,7 @@ function ciclo() {
     }
   }
 
-  reloj = requestAnimationFrame(ciclo);
+  reloj = camara.requestVideoFrameCallback(ciclo);
 }
 
 async function activarPrograma(programa: Caras | Manos | Voz | AnalisisCara) {

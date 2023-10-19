@@ -6,14 +6,6 @@ import Caras from '@/componentes/Caras';
 import Manos from '@/componentes/Manos';
 import Voz from '@/componentes/Voz';
 import AnalisisCara from '@/componentes/AnalisisCaras';
-// import Voz from '@/componentes/Voz';
-// import Caras from '@/componentes/Caras';
-// import Manos from '@/componentes/Manos';
-// import { iniciarCamara } from '@/utilidades/ayudas';
-// import { FaceLandmarkerResult, FilesetResolver } from '@mediapipe/tasks-vision';
-// import type { OpcionesCara, Programas, WasmFileset } from '@/tipos/www';
-// import Vision from '@/componentes/Vision';
-// import AnalisisCara from '@/componentes/AnalisisCaras';
 
 type Programas = {
   caras: Caras;
@@ -81,7 +73,7 @@ document.body.addEventListener('enflujo', (evento: CustomEventInit) => {
 
     case 'datos':
       const datos = JSON.parse(evento.detail.datos);
-      // console.log(datos);
+
       if (datos.caras) {
         programas.caras.pintar(datos.caras, faceConfig);
       }
@@ -110,23 +102,23 @@ const eventoCambioEstadoVision = async (activo: boolean, llave: keyof Programas)
 };
 
 async function inicio() {
-  if (controlCara.checked) {
+  if (controlCara.checked && !programas.caras.activo) {
     programas.caras.prender();
     programas.caras.activo = true;
   }
 
-  if (controlManos.checked) {
+  if (controlManos.checked && !programas.manos.activo) {
     programas.manos.prender();
     programas.manos.configurar();
     programas.manos.activo = true;
   }
 
-  if (controlVoz.checked) {
+  if (controlVoz.checked && !programas.voz.activo) {
     programas.voz.prender();
     programas.voz.activo = true;
   }
 
-  if (controlAnalisisCara.checked) {
+  if (controlAnalisisCara.checked && !programas.analisisCara.activo) {
     programas.analisisCara.prender();
     programas.analisisCara.activo = true;
   }

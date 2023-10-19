@@ -21,8 +21,6 @@ aplicacion.register(async (servidor) => {
     const { tipo } = peticion.query;
     const id = v4();
 
-    usuariosConectados[id] = usuario;
-
     usuario.send(mensaje({ accion: 'bienvenida', id }));
 
     if (tipo) {
@@ -32,15 +30,23 @@ aplicacion.register(async (servidor) => {
           transmisor = usuario;
           transmisorId = id;
           usuario.send(mensaje({ accion: 'iniciarTransmisor' }));
+
+          if (Object.keys(usuariosConectados).length) {
+            for (const idAmigo in usuariosConectados) {
+              usuariosConectados[idAmigo].send(mensaje({ accion: 'hayTransmisor', id: transmisorId }));
+              transmisor.send(mensaje({ accion: 'llamarA', id: idAmigo }));
+            }
+          }
         } else {
           usuario.send(mensaje({ accion: 'yaExisteTransmisor' }));
         }
-      } else if (transmisor && tipo === 'receptor') {
-        transmisor.send(mensaje({ accion: 'llamarA', id }));
+      } else if (tipo === 'receptor') {
+        usuariosConectados[id] = usuario;
 
         // Revisar primero si el transmisor existe, de lo contrario avisarle al receptor que espere a que se conecte el transmisor.
-        if (transmisorId) {
+        if (transmisor && transmisorId) {
           usuario.send(mensaje({ accion: 'iniciarReceptor', id: transmisorId }));
+          transmisor.send(mensaje({ accion: 'llamarA', id }));
         } else {
           usuario.send(mensaje({ accion: 'esperarTransmision' }));
         }
@@ -53,27 +59,32 @@ aplicacion.register(async (servidor) => {
 
       switch (datos.accion) {
         case 'ofrecerSeñal':
-          if (!usuariosConectados.hasOwnProperty(datos.enviarA)) return;
-          usuariosConectados[datos.enviarA].send(mensaje({ accion: 'conectarSeñal', id, señal: datos.señal }));
+          if (transmisor && datos.enviarA === transmisorId) {
+            transmisor.send(mensaje({ accion: 'conectarSeñal', id, señal: datos.señal }));
+          } else if (usuariosConectados.hasOwnProperty(datos.enviarA)) {
+            usuariosConectados[datos.enviarA].send(mensaje({ accion: 'conectarSeñal', id, señal: datos.señal }));
+          }
+
           break;
       }
     });
 
     usuario.on('close', () => {
-      if (transmisor) {
-        if (tipo === 'transmisor' && transmisorId === id) {
-          console.log('Desconectando al transmisor');
+      if (tipo === 'transmisor') {
+        if (transmisorId === id) {
           transmisor = null;
           transmisorId = null;
           for (const id in usuariosConectados) {
             usuariosConectados[id].send(mensaje({ accion: 'sinTransmisor' }));
           }
-        } else if (tipo === 'transmisor') {
-          console.log('se desconectó un fantasma que no hacía daño');
         } else {
-          delete usuariosConectados[id];
-          transmisor.send(mensaje({ accion: 'despedida', id }));
+          console.log('se desconectó un fantasma que no hacía daño');
         }
+      }
+
+      if (tipo === 'receptor') {
+        delete usuariosConectados[id];
+        if (transmisor) transmisor.send(mensaje({ accion: 'despedida', id }));
       }
     });
 

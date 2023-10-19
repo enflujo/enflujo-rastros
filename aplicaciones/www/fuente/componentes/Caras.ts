@@ -123,8 +123,6 @@ export default class Caras extends Vision {
             lineWidth: leftIris.width || 1,
           });
         }
-
-        // pintor.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_CONTOURS, { color: '#E0E0E0' });
       }
     }
   }

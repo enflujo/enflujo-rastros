@@ -15,6 +15,7 @@
     "noImplicitReturns": true,
     "skipLibCheck": true,
     "baseUrl": ".",
+    "types": ["vite/client"],
     "paths": {
       "@/*": ["fuente/*"],
       "@/tipos/*": ["../../tipos/*"]

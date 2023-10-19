@@ -12,7 +12,9 @@ export type Acciones =
   | 'conectarSeñal'
   | 'esperarTransmision'
   | 'datos'
-  | 'conectadoConTransmisor';
+  | 'conectadoConTransmisor'
+  | 'amigosConectados'
+  | 'hayTransmisor';
 
 export interface EventosRastrosBase {
   accion: Acciones;

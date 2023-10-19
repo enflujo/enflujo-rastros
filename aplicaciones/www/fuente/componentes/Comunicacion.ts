@@ -3,6 +3,8 @@ import { nuevoEventoEnFlujo } from '@/utilidades/ayudas';
 import Amigo from 'simple-peer';
 import type { Instance as InstanciaAmigo } from 'simple-peer';
 
+const urlServidor = import.meta.env.DEV ? `${window.location.hostname}:8000` : 'https://rastros.enflujo.com/tally/';
+
 const estadoInicialProgramas = { manos: false, caras: false, analisisCara: false, voz: false };
 export default class Comunicacion {
   amigos: { [id: string]: { canal: InstanciaAmigo; manos: boolean; caras: boolean; analisisCara: boolean } };
@@ -10,14 +12,18 @@ export default class Comunicacion {
   id: string | null;
   tipo: TipoUsuario;
   transmisor: InstanciaAmigo | null;
+  tieneAmigos: boolean;
+  numeroAmigos: number;
 
   constructor(tipo: TipoUsuario) {
     this.amigos = {};
     this.transmisor = null;
     this.tipo = tipo;
     this.id = null;
+    this.tieneAmigos = false;
+    this.numeroAmigos = 0;
     const protocolo = window.location.protocol == 'https:' ? 'wss' : 'ws';
-    this.conexion = new WebSocket(`${protocolo}://${window.location.hostname}:8000?tipo=${tipo}`);
+    this.conexion = new WebSocket(`${protocolo}://${urlServidor}?tipo=${tipo}`);
     this.conexion.onopen = this.inicio;
     this.conexion.onmessage = this.recibiendoMensaje;
     this.conexion.onclose = this.chao;
@@ -49,9 +55,13 @@ export default class Comunicacion {
         this.#hacerLlamada((datos as EventoMandarId).id, false);
         break;
       case 'conectarSeñal':
-        console.log('negociando señal');
         const d = datos as EventoConectarSeñal;
+
         if (this.amigos.hasOwnProperty(d.id)) {
+          if (this.amigos[d.id].canal.connected) {
+            return;
+          }
+          console.log('negociando señal');
           this.amigos[d.id].canal.signal(d.señal);
         }
         break;
@@ -61,6 +71,13 @@ export default class Comunicacion {
         break;
       case 'yaExisteTransmisor':
         nuevoEventoEnFlujo('yaExisteTransmisor');
+      case 'sinTransmisor':
+        nuevoEventoEnFlujo('sinTransmisor');
+        break;
+      case 'hayTransmisor':
+        console.log('ahora si hay transmisor con id', (datos as EventoMandarId).id);
+        this.#hacerLlamada((datos as EventoMandarId).id, false);
+        break;
       default:
         break;
     }
@@ -69,22 +86,25 @@ export default class Comunicacion {
   #hacerLlamada(amigoId: string, iniciarLlamada: boolean) {
     const amigo = new Amigo({
       initiator: iniciarLlamada,
-      trickle: true,
+      // trickle: true,
     });
 
     amigo.on('signal', (señal) => {
+      console.log('ofreciendo señal');
       this.#enviarDatosAlServidor({ accion: 'ofrecerSeñal', señal, enviarA: amigoId });
     });
 
     amigo.on('connect', () => {
       console.log('Conectado con:', amigoId);
       nuevoEventoEnFlujo('conectadoConTransmisor');
+      this.#revisarNumeroAmigos();
     });
 
     amigo.on('close', () => {
-      console.log('Cerro la señal', amigoId);
+      console.log('Adios a:', amigoId);
       amigo.destroy();
       delete this.amigos[amigoId];
+      this.#revisarNumeroAmigos();
     });
 
     amigo.on('data', (mensaje) => {
@@ -93,6 +113,10 @@ export default class Comunicacion {
 
     amigo.on('error', (err) => {
       console.error('Nuevo error', err);
+      // amigo.destroy();
+      // delete this.amigos[amigoId];
+
+      // console.log('amigos conectados', Object.keys(this.amigos).length);
     });
 
     amigo.on('end', () => {
@@ -106,7 +130,10 @@ export default class Comunicacion {
     this.conexion.send(JSON.stringify(datos));
   }
 
-  // #enviarDatosAlServidor(datos) {
-  //   this.conexion.send(JSON.stringify(datos));
-  // }
+  #revisarNumeroAmigos() {
+    const numeroAmigos = Object.keys(this.amigos).length;
+    this.tieneAmigos = !!numeroAmigos;
+    this.numeroAmigos = numeroAmigos;
+    nuevoEventoEnFlujo('amigosConectados');
+  }
 }

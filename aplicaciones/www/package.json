@@ -15,7 +15,8 @@
     "cssnano": "^6.0.1",
     "postcss": "^8.4.31",
     "sass": "^1.69.4",
-    "vite": "^4.4.11"
+    "vite": "^4.4.11",
+    "vite-plugin-mkcert": "^1.16.0"
   },
   "dependencies": {
     "@mediapipe/face_detection": "^0.4.1646425229",

@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import { fileURLToPath } from 'url';
+import mkcert from 'vite-plugin-mkcert';
 
 export default defineConfig({
   // base: '/',
@@ -14,6 +15,7 @@ export default defineConfig({
       'simple-peer': 'simple-peer/simplepeer.min.js',
     },
   },
+  plugins: [mkcert()],
   build: {
     outDir: '../../publico',
     assetsDir: 'recursos',

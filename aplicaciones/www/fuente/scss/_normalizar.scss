@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Martian+Mono:wght@100..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap');
+
+html {
+  box-sizing: border-box;
+  height: 100%;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --fuenteContenido: 'Martian Mono', 'Courier New', Courier, monospace;
+  --fuenteTitulo: 'Major Mono Display', 'Courier New', Courier, monospace;
+}
+
+body {
+  font-family: var(--fuenteContenido);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family: var(--fuenteTitulo);
+}

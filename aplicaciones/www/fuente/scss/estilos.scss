@@ -1,0 +1,150 @@
+@import './normalizar';
+
+$menuAncho: 20px;
+$menuAlto: 15px;
+$menuRayaAncho: 20px;
+$menuRayaAlto: 1px;
+$menuRayaRadio: 2px;
+$menuRayaEspacio: 4px;
+$menuRayaColor: rgb(236, 227, 227);
+
+::selection {
+  background-color: #30cac073;
+  color: #130808;
+}
+
+#menu {
+  position: fixed;
+  right: 10px;
+  top: 10px;
+  width: $menuAncho;
+  height: $menuAlto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 99;
+
+  .linea {
+    width: $menuRayaAncho;
+    height: $menuRayaAlto;
+    background-color: $menuRayaColor;
+    border-radius: $menuRayaRadio;
+    transition: all 0.2s ease-in-out;
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      width: $menuRayaAncho;
+      height: $menuRayaAlto;
+      background-color: $menuRayaColor;
+      border-radius: $menuRayaRadio;
+      transition: all 0.5s ease-in-out;
+    }
+    &::before {
+      transform: translate(0, -$menuRayaEspacio);
+    }
+    &::after {
+      transform: translate(0, $menuRayaEspacio);
+    }
+  }
+}
+
+.lienzo {
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  display: inline-block;
+  vertical-align: bottom;
+  top: 0;
+  z-index: 1;
+}
+
+#archivo {
+  color: aliceblue;
+  z-index: 7;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+#textoEnVivo {
+  font-size: 2em;
+  position: fixed;
+  opacity: 0.6;
+  font-size: 2em;
+  left: 0;
+  color: rgb(252, 245, 236);
+  width: 100vw;
+  text-align: center;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 7;
+}
+
+body {
+  background-color: rgb(31, 27, 25);
+}
+
+#controles {
+  background-color: rgba(228, 228, 224, 0.581);
+  padding: 0.5em;
+  position: fixed;
+  width: 200px;
+  right: 0;
+  top: 0;
+  z-index: 8;
+  display: none;
+
+  &.abierto {
+    display: block;
+  }
+}
+
+#contenedorAnalisisCaras {
+  position: absolute;
+  color: white;
+  top: 0;
+  z-index: 7;
+  width: 30vw;
+
+  ul {
+    list-style: none;
+    font-size: 0.8em;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    width: 100%;
+    background-color: rgba(240, 248, 255, 0.171);
+    margin-bottom: 0.2em;
+    position: relative;
+
+    .barra {
+      background-color: rgba(255, 255, 0, 0.368);
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 1em;
+    }
+  }
+}
+
+#parpadeos {
+  position: fixed;
+  color: rgb(203, 236, 106);
+  font-size: 4em;
+  width: fit-content;
+  text-align: center;
+  z-index: 6;
+  top: 0;
+}
+
+.contenedorTrazo {
+  position: absolute;
+  z-index: 7;
+  width: 100vw;
+  height: 100vh;
+}

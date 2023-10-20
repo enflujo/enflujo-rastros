@@ -3,7 +3,7 @@ import { nuevoEventoEnFlujo } from '@/utilidades/ayudas';
 import Amigo from 'simple-peer';
 import type { Instance as InstanciaAmigo } from 'simple-peer';
 
-const urlServidor = import.meta.env.DEV ? `${window.location.hostname}:8000` : 'https://rastros.enflujo.com/tally/';
+const urlServidor = import.meta.env.DEV ? `${window.location.hostname}:8000` : 'rastros.enflujo.com/tally/';
 
 const estadoInicialProgramas = { manos: false, caras: false, analisisCara: false, voz: false };
 export default class Comunicacion {

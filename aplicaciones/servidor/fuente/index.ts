@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import fastify from 'fastify';
 import WS from '@fastify/websocket';
 import { v4 } from 'uuid';
@@ -15,6 +16,9 @@ aplicacion.register(WS);
 function mensaje(obj: EventoRastros) {
   return JSON.stringify(obj);
 }
+const { PUERTO, NODE_ENV } = process.env;
+
+const puerto = NODE_ENV === 'produccion' && PUERTO ? +PUERTO : 8000;
 
 aplicacion.register(async (servidor) => {
   servidor.get<{ Querystring: ParametrosInicio }>('/:tipo', { websocket: true }, ({ socket: usuario }, peticion) => {
@@ -96,7 +100,7 @@ aplicacion.register(async (servidor) => {
   });
 });
 
-aplicacion.listen({ port: 8000 }, (error, direccion) => {
+aplicacion.listen({ port: puerto }, (error, direccion) => {
   if (error) throw error;
   console.log('servidor en', direccion);
 });

@@ -20,11 +20,9 @@ const { PUERTO, NODE_ENV } = process.env;
 
 const puerto = NODE_ENV === 'produccion' && PUERTO ? +PUERTO : 8000;
 
-aplicacion.register(async (servidor) => {
-  servidor.get<{ Querystring: ParametrosInicio }>(
-    '/tally/:tipo',
-    { websocket: true },
-    ({ socket: usuario }, peticion) => {
+aplicacion.register(
+  async (servidor) => {
+    servidor.get<{ Querystring: ParametrosInicio }>('/:tipo', { websocket: true }, ({ socket: usuario }, peticion) => {
       const { tipo } = peticion.query;
       const id = v4();
 
@@ -100,9 +98,10 @@ aplicacion.register(async (servidor) => {
         // Por último eliminamos al usuario de la lista de usuarios conectados.
         delete usuariosConectados[id];
       });
-    }
-  );
-});
+    });
+  },
+  { prefix: '/tally' }
+);
 
 aplicacion.listen({ port: puerto }, (error, direccion) => {
   if (error) throw error;

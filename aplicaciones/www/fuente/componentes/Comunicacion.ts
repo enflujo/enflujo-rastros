@@ -1,10 +1,63 @@
 import type { EventoConectarSeñal, EventoMandarId, EventoRastros, TipoUsuario } from '@/tipos/compartidos';
 import { nuevoEventoEnFlujo } from '@/utilidades/ayudas';
 import Amigo from 'simple-peer';
-import type { Instance as InstanciaAmigo } from 'simple-peer';
+import type { Instance as InstanciaAmigo, Options } from 'simple-peer';
+import SimplePeer from 'simple-peer';
 
-// const urlServidor = import.meta.env.DEV ? `${window.location.hostname}:8000` : 'rastros.enflujo.com/tally/';
-const urlServidor = 'rastros.enflujo.com/tally/';
+// …
+
+class Peer extends SimplePeer {
+  webRTCPaused: boolean;
+  webRTCMessageQueue: string[];
+
+  constructor(opts: Options) {
+    super(opts);
+
+    this.webRTCPaused = false;
+    this.webRTCMessageQueue = [];
+  }
+
+  sendMessageQueued() {
+    this.webRTCPaused = false;
+
+    let message = this.webRTCMessageQueue.shift();
+
+    while (message) {
+      if (this._channel.bufferedAmount && this._channel.bufferedAmount > BUFFER_FULL_THRESHOLD) {
+        this.webRTCPaused = true;
+        this.webRTCMessageQueue.unshift(message);
+
+        const listener = () => {
+          this._channel.removeEventListener('bufferedamountlow', listener);
+          this.sendMessageQueued();
+        };
+
+        this._channel.addEventListener('bufferedamountlow', listener);
+        return;
+      }
+
+      try {
+        super.send(message);
+        message = this.webRTCMessageQueue.shift();
+      } catch (error) {
+        throw new Error(`Error send message, reason: ${error.name} - ${error.message}`);
+      }
+    }
+  }
+
+  send(chunk) {
+    this.webRTCMessageQueue.push(chunk);
+
+    if (this.webRTCPaused) {
+      return;
+    }
+
+    this.sendMessageQueued();
+  }
+}
+
+const urlServidor = import.meta.env.DEV ? `${window.location.hostname}:8000` : 'rastros.enflujo.com/tally/';
+// const urlServidor = 'rastros.enflujo.com/tally/';
 const estadoInicialProgramas = { manos: false, caras: false, analisisCara: false, voz: false };
 export default class Comunicacion {
   amigos: { [id: string]: { canal: InstanciaAmigo; manos: boolean; caras: boolean; analisisCara: boolean } };
@@ -118,6 +171,8 @@ export default class Comunicacion {
 
       // console.log('amigos conectados', Object.keys(this.amigos).length);
     });
+
+    console.log(amigo);
 
     amigo.on('end', () => {
       console.log('fin');

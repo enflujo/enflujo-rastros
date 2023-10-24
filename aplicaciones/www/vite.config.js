@@ -3,6 +3,11 @@ import { resolve } from 'path';
 import { fileURLToPath } from 'url';
 import mkcert from 'vite-plugin-mkcert';
 
+// const plugins = [];
+// if (import.meta.env.DEV) {
+//   plugins.push(mkcert)
+// }
+
 export default defineConfig({
   // base: '/',
   server: {
@@ -15,7 +20,7 @@ export default defineConfig({
       'simple-peer': 'simple-peer/simplepeer.min.js',
     },
   },
-  plugins: [mkcert()],
+  // plugins: [mkcert()],
   build: {
     outDir: '../../publico',
     assetsDir: 'recursos',

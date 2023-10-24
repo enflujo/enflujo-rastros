@@ -86,8 +86,8 @@ function ciclo(ahora: number) {
 
     for (const id in com.amigos) {
       const amigo = com.amigos[id];
+      // console.log(amigo.canal.)
       if (!amigo.canal.connected) return;
-
       if (resultadoCaras) {
         amigo.canal.send(JSON.stringify({ caras: resultadoCaras.faceLandmarks }));
       }

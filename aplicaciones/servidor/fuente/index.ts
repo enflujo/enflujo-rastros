@@ -89,6 +89,7 @@ aplicacion.register(
 
         if (tipo === 'receptor') {
           delete usuariosConectados[id];
+          console.log('desconectando al usuario', id);
           if (transmisor) transmisor.send(mensaje({ accion: 'despedida', id }));
         }
       });

@@ -1,5 +1,5 @@
 export type TipoUsuario = 'transmisor' | 'receptor';
-
+export type LlavesProgramas = 'caras' | 'manos' | 'voz' | 'analisisCara' | 'datos';
 export type Acciones =
   | 'bienvenida'
   | 'iniciarTransmisor'
@@ -14,7 +14,9 @@ export type Acciones =
   | 'datos'
   | 'conectadoConTransmisor'
   | 'amigosConectados'
-  | 'hayTransmisor';
+  | 'hayTransmisor'
+  | 'datosVoz'
+  | 'textoVoz';
 
 export interface EventosRastrosBase {
   accion: Acciones;

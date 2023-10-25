@@ -1,17 +1,34 @@
 import '@/scss/estilos.scss';
 import Comunicacion from '@/componentes/Comunicacion';
-import type { Acciones } from '@/tipos/compartidos';
+import type { Acciones, LlavesProgramas } from '@/tipos/compartidos';
 import type { OpcionesCara } from '@/tipos/www';
 import Caras from '@/componentes/Caras';
 import Manos from '@/componentes/Manos';
 import Voz from '@/componentes/Voz';
 import AnalisisCara from '@/componentes/AnalisisCaras';
+import FlujoDatos from './componentes/FlujoDatos';
+import type { LlavesContenedoresDatos } from './componentes/FlujoDatos';
+import type { Classifications, NormalizedLandmark } from '@mediapipe/tasks-vision';
+
+export type DatosVoz = {
+  tipo: 'textoVoz' | 'datosVoz';
+  datos: string;
+};
+
+export type EstructurasDatos = {
+  caras?: NormalizedLandmark[][];
+  manos?: NormalizedLandmark[][];
+  analisisCara?: Classifications[];
+  voz?: DatosVoz;
+  datos?: LlavesContenedoresDatos;
+};
 
 type Programas = {
   caras: Caras;
   manos: Manos;
   voz: Voz;
   analisisCara: AnalisisCara;
+  datos: FlujoDatos;
 };
 
 const faceConfig: OpcionesCara = {
@@ -32,16 +49,15 @@ const menuBtn = document.getElementById('menu') as HTMLDivElement;
 const contenedorControles = document.getElementById('controles') as HTMLDivElement;
 
 const com = new Comunicacion('receptor');
-const controlCara = document.getElementById('caras') as HTMLInputElement;
-const controlManos = document.getElementById('manos') as HTMLInputElement;
-const controlVoz = document.getElementById('voz') as HTMLInputElement;
-const controlAnalisisCara = document.getElementById('analisisCara') as HTMLInputElement;
+const controles = contenedorControles.querySelectorAll<HTMLInputElement>('.modelo input');
+const activos = new Set<keyof Programas>();
 
 const programas: Programas = {
   caras: new Caras(),
   manos: new Manos(),
   voz: new Voz(),
   analisisCara: new AnalisisCara(),
+  datos: new FlujoDatos(),
 };
 
 menuBtn.onclick = () => {
@@ -69,20 +85,24 @@ document.body.addEventListener('enflujo', (evento: CustomEventInit) => {
       inicio().catch(console.error);
       break;
     case 'sinTransmisor':
+      console.log('sin transmisor');
       break;
 
     case 'datos':
-      const datos = JSON.parse(evento.detail.datos);
+      const datos: EstructurasDatos = JSON.parse(evento.detail.datos);
 
       if (datos.caras) {
         programas.caras.pintar(datos.caras, faceConfig);
-      }
-
-      if (datos.manos) {
+      } else if (datos.analisisCara) {
+        programas.analisisCara.pintar(datos.analisisCara);
+      } else if (datos.manos) {
         programas.manos.pintar(datos.manos);
+      } else if (datos.voz) {
+        programas.voz.pintar(datos.voz);
+      } else if (datos.datos) {
+        programas.datos.pintar(datos.datos);
       }
 
-      //
       break;
 
     default:
@@ -90,140 +110,38 @@ document.body.addEventListener('enflujo', (evento: CustomEventInit) => {
   }
 });
 
-const eventoCambioEstadoVision = async (activo: boolean, llave: keyof Programas) => {
-  const programa = programas[llave];
-
-  if (activo) {
-    programa.activo = true;
-  } else {
-    programa.apagar();
-    programa.activo = false;
-  }
-};
-
 async function inicio() {
-  if (controlCara.checked && !programas.caras.activo) {
-    programas.caras.prender();
-    programas.caras.activo = true;
-  }
+  controles.forEach((control) => {
+    const llave = control.id as LlavesProgramas;
+    const programa = programas[llave];
 
-  if (controlManos.checked && !programas.manos.activo) {
-    programas.manos.prender();
-    programas.manos.configurar();
-    programas.manos.activo = true;
-  }
+    if (control.checked && !programa.activo) {
+      programa.prender();
+      programa.activo = true;
+      activos.add(llave);
+    }
 
-  if (controlVoz.checked && !programas.voz.activo) {
-    programas.voz.prender();
-    programas.voz.activo = true;
-  }
+    control.onchange = () => {
+      if (programa.activo === control.checked) return;
+      programa.activo = control.checked;
 
-  if (controlAnalisisCara.checked && !programas.analisisCara.activo) {
-    programas.analisisCara.prender();
-    programas.analisisCara.activo = true;
+      if (control.checked) {
+        programa.prender();
+        activos.add(llave);
+      } else {
+        programa.apagar();
+        activos.delete(llave);
+      }
+
+      if (com.transmisor) {
+        com.transmisor.send(
+          JSON.stringify({ accion: 'cambiarEstado', id: com.id, programa: llave, estado: control.checked })
+        );
+      }
+    };
+  });
+
+  if (activos.size && com.transmisor) {
+    com.transmisor.send(JSON.stringify({ accion: 'activarVarios', id: com.id, programas: Array.from(activos) }));
   }
 }
-
-// const programas: Programas = {
-//   caras: new Caras(),
-//   manos: new Manos(),
-//   voz: new Voz(),
-//   analisisCara: new AnalisisCara(),
-// };
-
-// let reloj = -1;
-
-// async function inicio() {
-
-//   let camara: HTMLVideoElement;
-//   let modeloVision: WasmFileset;
-
-//   controlCara.onchange = async (evento: Event) => {
-//     await eventoCambioEstadoVision((evento.target as HTMLInputElement).checked, 'caras');
-//   };
-
-//   controlManos.onchange = async (evento: Event) => {
-//     await eventoCambioEstadoVision((evento.target as HTMLInputElement).checked, 'manos');
-//   };
-
-//   controlVoz.onchange = async (evento: Event) => {
-//     if ((evento.target as HTMLInputElement).checked) {
-//       await activarPrograma(programas.voz);
-//     } else {
-//       programas.voz.apagar();
-//       programas.voz.activo = false;
-//     }
-//   };
-
-//   controlAnalisisCara.onchange = (evento: Event) => {
-//     if ((evento.target as HTMLInputElement).checked) {
-//       programas.analisisCara.prender();
-//     } else {
-//       programas.analisisCara.apagar();
-//     }
-//   };
-
-//   let ultimoFotograma = -1;
-
-//   function ciclo() {
-//     const tiempoAhora = performance.now();
-
-//     if (camara.currentTime !== ultimoFotograma) {
-//       ultimoFotograma = camara.currentTime;
-//       let resultadoCaras: FaceLandmarkerResult | undefined;
-
-//       if (programas.caras.activo) {
-//         resultadoCaras = programas.caras.detectar(camara, tiempoAhora);
-
-//         if (resultadoCaras) programas.caras.pintar(resultadoCaras.faceLandmarks, faceConfig);
-//       }
-
-//       if (programas.analisisCara.activo) {
-//         if (resultadoCaras) {
-//           programas.analisisCara.pintar(resultadoCaras.faceBlendshapes);
-//         } else {
-//           resultadoCaras = programas.caras.detectar(camara, tiempoAhora);
-//           if (resultadoCaras) programas.analisisCara.pintar(resultadoCaras.faceBlendshapes);
-//         }
-//       }
-
-//       if (programas.manos.activo) {
-//         const resultadoManos = programas.manos.detectar(camara, tiempoAhora);
-//         programas.manos.pintar(resultadoManos.landmarks);
-//       }
-//     }
-
-//     reloj = requestAnimationFrame(ciclo);
-//   }
-
-//   ciclo();
-
-//   async function activarPrograma(programa: Caras | Manos | Voz | AnalisisCara) {
-//     if (programa instanceof Vision) {
-//       if (!camara) {
-//         camara = (await iniciarCamara()) as HTMLVideoElement;
-//       }
-
-//       if (!modeloVision) {
-//         modeloVision = await FilesetResolver.forVisionTasks(
-//           'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm'
-//         );
-//       }
-
-//       if (!camara || !modeloVision) return;
-
-//       programa
-//         .prender(camara)
-//         .cargarModelo(modeloVision)
-//         .then(() => {
-//           programa.activo = true;
-//         });
-//     } else if (programa instanceof Voz) {
-//       programa.prender();
-//     } else {
-//       programa.prender();
-//     }
-//   }
-// }
-
-// inicio();

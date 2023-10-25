@@ -1,16 +1,19 @@
 import { DrawingUtils } from '@mediapipe/tasks-vision';
-import type { FaceLandmarker, HandLandmarker } from '@mediapipe/tasks-vision';
+import { FaceLandmarker, HandLandmarker } from '@mediapipe/tasks-vision';
 import { escalarLienzo } from '@/utilidades/ayudas';
 
+export type TiposVision = 'caras' | 'manos';
 export default class Vision {
   lienzo?: HTMLCanvasElement;
   ctx?: CanvasRenderingContext2D;
   pintor?: DrawingUtils;
   activo: boolean;
   modelo?: FaceLandmarker | HandLandmarker;
+  tipo: TiposVision;
 
-  constructor() {
+  constructor(tipo: TiposVision) {
     this.activo = false;
+    this.tipo = tipo;
   }
 
   prender() {
@@ -21,6 +24,12 @@ export default class Vision {
 
     document.body.appendChild(this.lienzo);
     escalarLienzo(this.lienzo, this.ctx);
+
+    if (this.tipo === 'manos') {
+      console.log('configurar manos');
+      this.ctx.globalAlpha = 0.05;
+      this.lienzo.style.zIndex = '2';
+    }
     return this;
   }
 

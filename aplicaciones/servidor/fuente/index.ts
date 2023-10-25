@@ -6,6 +6,7 @@ import type WebSocket from 'ws';
 import type { EventoRastros } from '@/tipos/compartidos';
 import type { ParametrosInicio } from '@/tipos/servidor';
 
+const { PUERTO, NODE_ENV } = process.env;
 const aplicacion = fastify();
 const usuariosConectados: { [id: string]: WebSocket } = {};
 let transmisor: WebSocket | null;
@@ -16,7 +17,6 @@ aplicacion.register(WS);
 function mensaje(obj: EventoRastros) {
   return JSON.stringify(obj);
 }
-const { PUERTO, NODE_ENV } = process.env;
 
 const puerto = NODE_ENV === 'produccion' && PUERTO ? +PUERTO : 8000;
 
@@ -89,6 +89,7 @@ aplicacion.register(
 
         if (tipo === 'receptor') {
           delete usuariosConectados[id];
+          console.log('desconectando al usuario', id);
           if (transmisor) transmisor.send(mensaje({ accion: 'despedida', id }));
         }
       });
@@ -100,7 +101,7 @@ aplicacion.register(
       });
     });
   },
-  { prefix: '/tally' }
+  { prefix: NODE_ENV === 'produccion' ? '/tally' : '/' }
 );
 
 aplicacion.listen({ port: puerto }, (error, direccion) => {

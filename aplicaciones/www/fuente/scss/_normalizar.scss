@@ -21,6 +21,12 @@ body {
 :root {
   --fuenteContenido: 'Martian Mono', 'Courier New', Courier, monospace;
   --fuenteTitulo: 'Major Mono Display', 'Courier New', Courier, monospace;
+  --azulChicle: #10c5f8;
+  --moraAzul: #6736dd;
+  --amarilloQuemao: #ffea00;
+  --rojoPorrazo: #f56468;
+  --moradoProfundo: #7a004f;
+  --blanco: #f1eeee;
 }
 
 body {
@@ -33,4 +39,14 @@ h3,
 h4,
 h5 {
   font-family: var(--fuenteTitulo);
+}
+
+[type='checkbox'] {
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 0;
+  outline: none;
+  appearance: none;
 }

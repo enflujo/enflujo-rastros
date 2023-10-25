@@ -4,7 +4,7 @@ import { FilesetResolver } from '@mediapipe/tasks-vision';
 import Comunicacion from '@/componentes/Comunicacion';
 import { escalarVideo, iniciarCamara } from './utilidades/ayudas';
 import type { WasmFileset } from '@/tipos/www';
-import { Acciones } from '@/tipos/compartidos';
+import { Acciones, LlavesProgramas } from '@/tipos/compartidos';
 import Caras from '@/componentes/Caras';
 import Manos from '@/componentes/Manos';
 import Voz from '@/componentes/Voz';
@@ -20,14 +20,12 @@ type Programas = {
   caras: Caras;
   manos: Manos;
   voz: Voz;
-  analisisCara: AnalisisCara;
 };
 
 const programas: Programas = {
   caras: new Caras(),
   manos: new Manos(),
   voz: new Voz(),
-  analisisCara: new AnalisisCara(),
 };
 
 const mensajeEstado = document.getElementById('mensajeEstado') as HTMLSpanElement;
@@ -63,16 +61,60 @@ document.body.addEventListener('enflujo', (evento: CustomEventInit) => {
     case 'amigosConectados':
       conteoAmigos.innerText = `${com.numeroAmigos}`;
       break;
+
+    // Voz
+    case 'textoVoz':
+      mandarDatosVoz(evento.detail);
+      break;
+
+    case 'datosVoz':
+      mandarDatosVoz(evento.detail);
+      break;
+    case 'datos':
+      const datos = JSON.parse(evento.detail.datos);
+      const amigo = com.amigos[datos.id];
+
+      if (amigo) {
+        switch (datos.accion) {
+          case 'activarVarios':
+            datos.programas.forEach((llave: LlavesProgramas) => {
+              amigo[llave] = true;
+            });
+            break;
+          case 'cambiarEstado':
+            amigo[datos.programa as LlavesProgramas] = datos.estado;
+            break;
+          default:
+            break;
+        }
+      }
+
     default:
       break;
   }
 });
 
+function mandarDatosVoz(datos: string) {
+  if (com.tieneAmigos) {
+    for (const id in com.amigos) {
+      const amigo = com.amigos[id];
+      if (!amigo.canal.connected) return;
+
+      if (amigo.voz) {
+        amigo.canal.send(JSON.stringify({ voz: datos }));
+      }
+
+      if (amigo.datos) {
+        amigo.canal.send(JSON.stringify({ datos: { voz: datos } }));
+      }
+    }
+  }
+}
+
 async function inicio() {
   await activarPrograma(programas.caras);
   await activarPrograma(programas.manos);
   await activarPrograma(programas.voz);
-  await activarPrograma(programas.analisisCara);
 
   estadoTransmitiendo.className = 'prendido';
   mensajeEstado.innerText = `..:: Transmitting ::..`;
@@ -86,14 +128,37 @@ function ciclo(ahora: number) {
 
     for (const id in com.amigos) {
       const amigo = com.amigos[id];
-      if (!amigo.canal.connected) return;
 
-      if (resultadoCaras) {
-        amigo.canal.send(JSON.stringify({ caras: resultadoCaras.faceLandmarks }));
+      if (!amigo.canal.connected) return;
+      // console.log(amigo.canal._channel.bufferedAmount);
+      if (resultadoCaras && resultadoCaras.faceLandmarks.length) {
+        if (amigo.caras) {
+          amigo.canal.send(JSON.stringify({ caras: resultadoCaras.faceLandmarks }));
+        }
+
+        if (amigo.datos) {
+          amigo.canal.send(JSON.stringify({ datos: { caras: resultadoCaras.faceLandmarks } }));
+        }
       }
 
-      if (resultadoManos) {
-        amigo.canal.send(JSON.stringify({ manos: resultadoManos.landmarks }));
+      if (resultadoManos && resultadoManos.landmarks.length) {
+        if (amigo.manos) {
+          amigo.canal.send(JSON.stringify({ manos: resultadoManos.landmarks }));
+        }
+
+        if (amigo.datos) {
+          amigo.canal.send(JSON.stringify({ datos: { manos: resultadoManos.landmarks } }));
+        }
+      }
+
+      if (resultadoCaras && resultadoCaras.faceBlendshapes.length) {
+        if (amigo.analisisCara) {
+          amigo.canal.send(JSON.stringify({ analisisCara: resultadoCaras.faceBlendshapes }));
+        }
+
+        if (amigo.datos) {
+          amigo.canal.send(JSON.stringify({ datos: { analisisCara: resultadoCaras.faceBlendshapes } }));
+        }
       }
     }
   }
@@ -118,9 +183,9 @@ async function activarPrograma(programa: Caras | Manos | Voz | AnalisisCara) {
 
     await programa.cargarModelo(modeloVision);
     programa.activo = true;
-  } else if (programa instanceof Voz || programa instanceof AnalisisCara) {
-    // programa.prender();
+  } else if (programa instanceof Voz) {
+    programa.cargarModelo();
   } else {
-    console.error('No sé que programa cargar :(');
+    console.error('No sé que programa cargar :(', programa);
   }
 }

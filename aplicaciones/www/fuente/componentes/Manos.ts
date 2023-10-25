@@ -7,7 +7,7 @@ import Vision from '@/componentes/Vision';
 
 export default class Manos extends Vision {
   constructor() {
-    super();
+    super('manos');
   }
 
   async cargarModelo(vision: WasmFileset) {

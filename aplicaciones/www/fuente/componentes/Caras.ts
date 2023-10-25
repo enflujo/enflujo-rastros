@@ -4,7 +4,7 @@ import Vision from '@/componentes/Vision';
 
 export default class Caras extends Vision {
   constructor() {
-    super();
+    super('caras');
     // this.lienzo.style.zIndex = '1';
   }
 

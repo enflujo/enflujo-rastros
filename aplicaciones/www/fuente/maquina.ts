@@ -100,12 +100,8 @@ function mandarDatosVoz(datos: string) {
       const amigo = com.amigos[id];
       if (!amigo.canal.connected) return;
 
-      if (amigo.voz) {
+      if (amigo.voz || amigo.datos) {
         amigo.canal.send(JSON.stringify({ voz: datos }));
-      }
-
-      if (amigo.datos) {
-        amigo.canal.send(JSON.stringify({ datos: { voz: datos } }));
       }
     }
   }
@@ -132,32 +128,20 @@ function ciclo(ahora: number) {
       if (!amigo.canal.connected) return;
       // console.log(amigo.canal._channel.bufferedAmount);
       if (resultadoCaras && resultadoCaras.faceLandmarks.length) {
-        if (amigo.caras) {
+        if (amigo.caras || amigo.datos) {
           amigo.canal.send(JSON.stringify({ caras: resultadoCaras.faceLandmarks }));
-        }
-
-        if (amigo.datos) {
-          amigo.canal.send(JSON.stringify({ datos: { caras: resultadoCaras.faceLandmarks } }));
         }
       }
 
       if (resultadoManos && resultadoManos.landmarks.length) {
-        if (amigo.manos) {
+        if (amigo.manos || amigo.datos) {
           amigo.canal.send(JSON.stringify({ manos: resultadoManos.landmarks }));
-        }
-
-        if (amigo.datos) {
-          amigo.canal.send(JSON.stringify({ datos: { manos: resultadoManos.landmarks } }));
         }
       }
 
       if (resultadoCaras && resultadoCaras.faceBlendshapes.length) {
-        if (amigo.analisisCara) {
+        if (amigo.analisisCara || amigo.datos) {
           amigo.canal.send(JSON.stringify({ analisisCara: resultadoCaras.faceBlendshapes }));
-        }
-
-        if (amigo.datos) {
-          amigo.canal.send(JSON.stringify({ datos: { analisisCara: resultadoCaras.faceBlendshapes } }));
         }
       }
     }

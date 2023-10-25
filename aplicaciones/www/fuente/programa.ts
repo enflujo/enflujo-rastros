@@ -91,16 +91,18 @@ document.body.addEventListener('enflujo', (evento: CustomEventInit) => {
     case 'datos':
       const datos: EstructurasDatos = JSON.parse(evento.detail.datos);
 
-      if (datos.caras) {
+      if (datos.caras && programas.caras.activo) {
         programas.caras.pintar(datos.caras, faceConfig);
-      } else if (datos.analisisCara) {
+      } else if (datos.analisisCara && programas.analisisCara.activo) {
         programas.analisisCara.pintar(datos.analisisCara);
-      } else if (datos.manos) {
+      } else if (datos.manos && programas.manos.activo) {
         programas.manos.pintar(datos.manos);
-      } else if (datos.voz) {
+      } else if (datos.voz && programas.voz.activo) {
         programas.voz.pintar(datos.voz);
-      } else if (datos.datos) {
-        programas.datos.pintar(datos.datos);
+      }
+
+      if (programas.datos.activo) {
+        programas.datos.pintar(datos);
       }
 
       break;

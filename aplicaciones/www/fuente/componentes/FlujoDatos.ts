@@ -1,3 +1,5 @@
+import { EstructurasDatos } from '@/programa';
+
 export type LlavesContenedoresDatos = 'caras' | 'manos' | 'analisisCara' | 'voz';
 
 let contenedor: HTMLDivElement;
@@ -33,7 +35,7 @@ export default class FlujoDatos {
     this.activo = false;
   }
 
-  pintar(datos: LlavesContenedoresDatos) {
+  pintar(datos: EstructurasDatos) {
     const contenedores = this.contenedores;
 
     Object.keys(datos).forEach((llave) => {

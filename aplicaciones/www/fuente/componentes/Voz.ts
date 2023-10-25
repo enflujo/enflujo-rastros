@@ -1,3 +1,5 @@
+import { DatosVoz } from '@/programa';
+import { nuevoEventoEnFlujo } from '@/utilidades/ayudas';
 import sentimientoVoz from '@/utilidades/sentimientoVoz';
 
 const Reconocimiento = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -109,17 +111,24 @@ export default class Voz {
   }
 
   procesarResultado(transcripcion: string, yaTermino: boolean) {
+    if (yaTermino) {
+      const sentimiento = sentimientoVoz(transcripcion);
+      nuevoEventoEnFlujo('datosVoz', JSON.stringify(sentimiento));
+    } else {
+      nuevoEventoEnFlujo('textoVoz', transcripcion);
+    }
+  }
+
+  pintar(datos: DatosVoz) {
     if (!this.textoEnVivo || !this.archivo) return;
 
-    this.textoEnVivo.innerText = transcripcion;
-    if (yaTermino) {
+    if (datos.tipo === 'textoVoz') {
+      this.textoEnVivo.innerText = datos.datos;
+    } else if (datos.tipo === 'datosVoz') {
       this.textoEnVivo.innerText = '';
       const frase = document.createElement('p');
-      const sentimiento = sentimientoVoz(transcripcion);
-
-      frase.innerText = `${transcripcion} (sentiment: ${JSON.stringify(sentimiento, null, 2)})`;
+      frase.innerText = `(sentiment: ${JSON.stringify(datos.datos, null, 2)})`;
       this.archivo.appendChild(frase);
-      // archivo.scroll();
     }
   }
 

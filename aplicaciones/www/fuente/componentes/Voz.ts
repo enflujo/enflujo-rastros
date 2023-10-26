@@ -1,14 +1,12 @@
 import { DatosVoz } from '@/programa';
-import { nuevoEventoEnFlujo } from '@/utilidades/ayudas';
+import { escalarLienzo, nuevoEventoEnFlujo } from '@/utilidades/ayudas';
 import sentimientoVoz from '@/utilidades/sentimientoVoz';
 
 const Reconocimiento = window.SpeechRecognition || window.webkitSpeechRecognition;
-const Gramatica = window.SpeechGrammarList || window.webkitSpeechGrammarList;
-const ReconocimientoEvento = window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
-const sintetizador = window.speechSynthesis;
-
 export default class Voz {
-  ctx?: AudioContext;
+  lienzo?: HTMLCanvasElement;
+  ctx?: CanvasRenderingContext2D;
+  ctxA?: AudioContext;
   maquina?: SpeechRecognition;
   flujo?: MediaStream;
   fuente?: MediaStreamAudioSourceNode;
@@ -16,7 +14,6 @@ export default class Voz {
   datos?: Float32Array;
   activo: boolean;
   textoEnVivo?: HTMLDivElement;
-  archivo?: HTMLDivElement;
   sensibilidadMax: number;
   hablando: boolean;
   reloj: number;
@@ -29,7 +26,7 @@ export default class Voz {
   }
 
   async cargarModelo() {
-    this.ctx = new AudioContext();
+    this.ctxA = new AudioContext();
 
     try {
       this.maquina = new Reconocimiento();
@@ -73,33 +70,36 @@ export default class Voz {
   }
 
   async prender() {
+    this.lienzo = document.createElement('canvas');
+    this.ctx = this.lienzo.getContext('2d') as CanvasRenderingContext2D;
+    this.lienzo.className = 'lienzo';
+
+    escalarLienzo(this.lienzo, this.ctx);
+
     this.textoEnVivo = document.createElement('div');
-    this.archivo = document.createElement('div');
-
     this.textoEnVivo.id = 'textoEnVivo';
-    this.archivo.id = 'archivo';
 
-    document.body.appendChild(this.archivo);
     document.body.appendChild(this.textoEnVivo);
+    document.body.appendChild(this.lienzo);
 
     return this;
   }
 
   apagarModelo() {
     this.detener();
-    delete this.ctx;
+    delete this.ctxA;
     delete this.flujo;
-    window.cancelAnimationFrame(this.reloj);
+    if (this.lienzo) document.body.removeChild(this.lienzo);
   }
 
   apagar() {
     if (this.textoEnVivo) document.body.removeChild(this.textoEnVivo);
-    if (this.archivo) document.body.removeChild(this.archivo);
 
     this.activo = false;
     this.sensibilidadMax = 0;
     this.hablando = false;
     this.reloj = 0;
+    window.cancelAnimationFrame(this.reloj);
   }
 
   detener() {
@@ -120,15 +120,12 @@ export default class Voz {
   }
 
   pintar(datos: DatosVoz) {
-    if (!this.textoEnVivo || !this.archivo) return;
+    if (!this.textoEnVivo) return;
 
     if (datos.tipo === 'textoVoz') {
       this.textoEnVivo.innerText = datos.datos;
     } else if (datos.tipo === 'datosVoz') {
-      this.textoEnVivo.innerText = '';
-      const frase = document.createElement('p');
-      frase.innerText = `(sentiment: ${JSON.stringify(datos.datos, null, 2)})`;
-      this.archivo.appendChild(frase);
+      console.log(datos);
     }
   }
 

@@ -17,26 +17,30 @@ export default class Vision {
   }
 
   prender() {
-    this.lienzo = document.createElement('canvas');
-    this.ctx = this.lienzo.getContext('2d') as CanvasRenderingContext2D;
-    if (!this.pintor) this.pintor = new DrawingUtils(this.ctx);
-    this.lienzo.className = 'lienzo';
+    if (!this.lienzo) {
+      this.lienzo = document.createElement('canvas');
+      this.ctx = this.lienzo.getContext('2d') as CanvasRenderingContext2D;
+      this.pintor = new DrawingUtils(this.ctx);
+      this.lienzo.className = 'lienzo';
+
+      escalarLienzo(this.lienzo, this.ctx);
+
+      if (this.tipo === 'manos') {
+        console.log('configurar manos');
+        this.ctx.globalAlpha = 0.05;
+        this.lienzo.style.zIndex = '2';
+      }
+    }
 
     document.body.appendChild(this.lienzo);
-    escalarLienzo(this.lienzo, this.ctx);
 
-    if (this.tipo === 'manos') {
-      console.log('configurar manos');
-      this.ctx.globalAlpha = 0.05;
-      this.lienzo.style.zIndex = '2';
-    }
     return this;
   }
 
   apagar() {
     if (!this.lienzo) return;
     document.body.removeChild(this.lienzo);
-    delete this.pintor;
+    // delete this.pintor;
     // delete this.lienzo;
     // delete this.modelo;
   }

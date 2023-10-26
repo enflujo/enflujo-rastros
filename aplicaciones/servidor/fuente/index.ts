@@ -26,6 +26,11 @@ aplicacion.register(
       const { tipo } = peticion.query;
       const id = v4();
 
+      const interval = setInterval(() => {
+        console.log('ping');
+        usuario.ping();
+      }, 30000);
+
       usuario.send(mensaje({ accion: 'bienvenida', id }));
 
       if (tipo) {
@@ -75,6 +80,7 @@ aplicacion.register(
       });
 
       usuario.on('close', () => {
+        clearInterval(interval);
         if (tipo === 'transmisor') {
           if (transmisorId === id) {
             transmisor = null;

@@ -47,7 +47,7 @@ export function escalarLienzo(lienzo: HTMLCanvasElement, ctx: CanvasRenderingCon
   ctx.scale(-1, 1);
 }
 
-export function nuevoEventoEnFlujo(tipo: Acciones, datos?: string) {
+export function nuevoEventoEnFlujo(tipo: Acciones, datos?: any) {
   document.body.dispatchEvent(
     new CustomEvent('enflujo', {
       detail: { tipo, datos },

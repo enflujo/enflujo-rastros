@@ -26,7 +26,6 @@ export default class Vision {
       escalarLienzo(this.lienzo, this.ctx);
 
       if (this.tipo === 'manos') {
-        console.log('configurar manos');
         this.ctx.globalAlpha = 0.05;
         this.lienzo.style.zIndex = '2';
       }

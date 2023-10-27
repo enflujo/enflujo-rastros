@@ -9,9 +9,15 @@ import AnalisisCara from '@/componentes/AnalisisCaras';
 import FlujoDatos from './componentes/FlujoDatos';
 import type { LlavesContenedoresDatos } from './componentes/FlujoDatos';
 import type { Classifications, NormalizedLandmark } from '@mediapipe/tasks-vision';
+import type { Polarity } from 'polarity';
 
 export type DatosVoz = {
-  tipo: 'textoVoz' | 'datosVoz';
+  tipo: 'datosVoz';
+  datos: Polarity;
+};
+
+export type DatosVozTexto = {
+  tipo: 'textoVoz';
   datos: string;
 };
 

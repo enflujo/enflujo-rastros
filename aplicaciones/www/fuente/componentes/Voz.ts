@@ -1,8 +1,14 @@
-import { DatosVoz } from '@/programa';
+import { DatosVoz, DatosVozTexto } from '@/programa';
 import { escalarLienzo, nuevoEventoEnFlujo } from '@/utilidades/ayudas';
 import sentimientoVoz from '@/utilidades/sentimientoVoz';
 
 const Reconocimiento = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+export type HistoricoSentimientos = {
+  negativo: number;
+  positivo: number;
+  polaridad: number;
+};
 export default class Voz {
   lienzo?: HTMLCanvasElement;
   ctx?: CanvasRenderingContext2D;
@@ -17,12 +23,14 @@ export default class Voz {
   sensibilidadMax: number;
   hablando: boolean;
   reloj: number;
+  historico: HistoricoSentimientos[];
 
   constructor() {
     this.activo = false;
     this.sensibilidadMax = 0;
     this.hablando = false;
     this.reloj = 0;
+    this.historico = [];
   }
 
   async cargarModelo() {
@@ -76,6 +84,7 @@ export default class Voz {
 
     escalarLienzo(this.lienzo, this.ctx);
 
+    this.ctx.strokeStyle = 'yellow';
     this.textoEnVivo = document.createElement('div');
     this.textoEnVivo.id = 'textoEnVivo';
 
@@ -113,20 +122,57 @@ export default class Voz {
   procesarResultado(transcripcion: string, yaTermino: boolean) {
     if (yaTermino) {
       const sentimiento = sentimientoVoz(transcripcion);
-      nuevoEventoEnFlujo('datosVoz', JSON.stringify(sentimiento));
+      nuevoEventoEnFlujo('datosVoz', sentimiento);
     } else {
       nuevoEventoEnFlujo('textoVoz', transcripcion);
     }
   }
 
-  pintar(datos: DatosVoz) {
+  pintar(datos: DatosVoz | DatosVozTexto) {
     if (!this.textoEnVivo) return;
 
     if (datos.tipo === 'textoVoz') {
       this.textoEnVivo.innerText = datos.datos;
     } else if (datos.tipo === 'datosVoz') {
-      console.log(datos);
+      console.log(datos.datos);
+      const { positivity, negativity, polarity } = (datos as DatosVoz).datos;
+      this.historico.push({ positivo: positivity, negativo: negativity, polaridad: polarity });
+      this.actualizarDiagrama();
     }
+  }
+
+  actualizarDiagrama() {
+    if (!this.ctx) return;
+    const ctx = this.ctx;
+    const datos = this.historico;
+    const margen = 150;
+    const ancho = window.innerWidth - margen * 2;
+    const alto = window.innerHeight - margen * 2;
+    const pasoX = ancho / datos.length;
+    const pasoY = alto / 20;
+    const y = window.innerHeight / 2;
+    const ejeY = (valor: number) => valor * pasoY;
+    console.log('pasoX', pasoX);
+    ctx.save();
+    ctx.strokeStyle = 'white';
+    ctx.beginPath();
+    ctx.moveTo(150, y);
+    ctx.lineTo(ancho, y);
+    // ctx.closePath();
+    ctx.stroke();
+    ctx.restore();
+
+    datos.forEach((punto, i) => {
+      if (i === 0) {
+        ctx.beginPath();
+        ctx.moveTo(margen, y);
+      }
+
+      ctx.lineTo(i * pasoX, ejeY(punto.polaridad));
+      console.log(margen, y, i * pasoX, ejeY(punto.polaridad));
+    });
+
+    ctx.stroke();
   }
 
   async definirSensilidad() {

@@ -125,10 +125,10 @@ export default class Voz {
     if (datos.tipo === 'textoVoz') {
       this.textoEnVivo.innerText = datos.datos;
     } else if (datos.tipo === 'datosVoz') {
-      this.textoEnVivo.innerText = '';
-      const frase = document.createElement('p');
-      frase.innerText = `(sentiment: ${JSON.stringify(datos.datos, null, 2)})`;
-      this.archivo.appendChild(frase);
+      // this.textoEnVivo.innerText = '';
+      // const frase = document.createElement('p');
+      // frase.innerText = `(sentiment: ${JSON.stringify(datos.datos, null, 2)})`;
+      // this.archivo.appendChild(frase);
     }
   }
 

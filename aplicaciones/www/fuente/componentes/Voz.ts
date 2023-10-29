@@ -150,20 +150,20 @@ export default class Voz {
     const ancho = window.innerWidth - margen * 2;
     const alto = window.innerHeight - margen * 2;
     const pasoX = ancho / datos.length;
-    const pasoY = alto / 2 / 7;
-    const y = window.innerHeight / 2;
+    const pasoY = alto / 30;
+    const y = window.innerHeight / 6;
     const ejeY = (valor: number) => valor * pasoY;
-    console.log('pasoX', pasoX);
+    // console.log('pasoX', pasoX);
 
-    ctx.clearRect(0, 0, ancho, alto);
-    ctx.save();
-    ctx.strokeStyle = 'white';
-    ctx.beginPath();
-    ctx.moveTo(150, y);
-    ctx.lineTo(ancho, y);
-    // ctx.closePath();
-    ctx.stroke();
-    ctx.restore();
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    // ctx.save();
+    // ctx.strokeStyle = 'white';
+    // ctx.beginPath();
+    // ctx.moveTo(150, y);
+    // ctx.lineTo(ancho, y);
+    // // ctx.closePath();
+    // ctx.stroke();
+    // ctx.restore();
 
     datos.forEach((punto, i) => {
       const y2 = y - ejeY(punto);
@@ -178,7 +178,7 @@ export default class Voz {
         ctx.fillText(`${punto}`, i * pasoX, y2);
       }
 
-      console.log(margen, y, i * pasoX, y2, punto);
+      // console.log(margen, y, i * pasoX, y2, punto);
     });
 
     ctx.stroke();

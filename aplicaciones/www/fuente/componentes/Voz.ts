@@ -23,7 +23,7 @@ export default class Voz {
   sensibilidadMax: number;
   hablando: boolean;
   reloj: number;
-  historico: HistoricoSentimientos[];
+  historico: number[];
 
   constructor() {
     this.activo = false;
@@ -82,9 +82,10 @@ export default class Voz {
     this.ctx = this.lienzo.getContext('2d') as CanvasRenderingContext2D;
     this.lienzo.className = 'lienzo';
 
-    escalarLienzo(this.lienzo, this.ctx);
-
+    escalarLienzo(this.lienzo, this.ctx, false);
+    this.ctx.font = '15px Arial';
     this.ctx.strokeStyle = 'yellow';
+    this.ctx.fillStyle = 'yellow';
     this.textoEnVivo = document.createElement('div');
     this.textoEnVivo.id = 'textoEnVivo';
 
@@ -135,8 +136,8 @@ export default class Voz {
       this.textoEnVivo.innerText = datos.datos;
     } else if (datos.tipo === 'datosVoz') {
       console.log(datos.datos);
-      const { positivity, negativity, polarity } = (datos as DatosVoz).datos;
-      this.historico.push({ positivo: positivity, negativo: negativity, polaridad: polarity });
+      const { polarity } = (datos as DatosVoz).datos;
+      this.historico.push(polarity);
       this.actualizarDiagrama();
     }
   }
@@ -149,10 +150,12 @@ export default class Voz {
     const ancho = window.innerWidth - margen * 2;
     const alto = window.innerHeight - margen * 2;
     const pasoX = ancho / datos.length;
-    const pasoY = alto / 20;
+    const pasoY = alto / 2 / 7;
     const y = window.innerHeight / 2;
     const ejeY = (valor: number) => valor * pasoY;
     console.log('pasoX', pasoX);
+
+    ctx.clearRect(0, 0, ancho, alto);
     ctx.save();
     ctx.strokeStyle = 'white';
     ctx.beginPath();
@@ -163,13 +166,19 @@ export default class Voz {
     ctx.restore();
 
     datos.forEach((punto, i) => {
+      const y2 = y - ejeY(punto);
+
       if (i === 0) {
         ctx.beginPath();
         ctx.moveTo(margen, y);
+        ctx.lineTo(pasoX, y2);
+        ctx.fillText(`${punto}`, pasoX, y2);
+      } else {
+        ctx.lineTo(i * pasoX, y2);
+        ctx.fillText(`${punto}`, i * pasoX, y2);
       }
 
-      ctx.lineTo(i * pasoX, ejeY(punto.polaridad));
-      console.log(margen, y, i * pasoX, ejeY(punto.polaridad));
+      console.log(margen, y, i * pasoX, y2, punto);
     });
 
     ctx.stroke();

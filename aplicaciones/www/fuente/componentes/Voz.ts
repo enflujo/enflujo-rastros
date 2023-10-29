@@ -135,7 +135,6 @@ export default class Voz {
     if (datos.tipo === 'textoVoz') {
       this.textoEnVivo.innerText = datos.datos;
     } else if (datos.tipo === 'datosVoz') {
-      console.log(datos.datos);
       const { polarity } = (datos as DatosVoz).datos;
       this.historico.push(polarity);
       this.actualizarDiagrama();

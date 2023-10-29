@@ -99,7 +99,6 @@ export default class Voz {
     this.detener();
     delete this.ctxA;
     delete this.flujo;
-    if (this.lienzo) document.body.removeChild(this.lienzo);
   }
 
   apagar() {
@@ -109,6 +108,7 @@ export default class Voz {
     this.sensibilidadMax = 0;
     this.hablando = false;
     this.reloj = 0;
+    if (this.lienzo) document.body.removeChild(this.lienzo);
     window.cancelAnimationFrame(this.reloj);
   }
 

@@ -37,17 +37,19 @@ export function escalarVideo(camara: HTMLVideoElement) {
   camara.height = videoHeight;
 }
 
-export function escalarLienzo(lienzo: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
+export function escalarLienzo(lienzo: HTMLCanvasElement, ctx: CanvasRenderingContext2D, invertir = true) {
   if (!ctx) return;
   lienzo.width = window.innerWidth;
   lienzo.height = window.innerHeight;
 
   // invertir lienzo de manera horizontal
-  ctx.translate(window.innerWidth, 0);
-  ctx.scale(-1, 1);
+  if (invertir) {
+    ctx.translate(window.innerWidth, 0);
+    ctx.scale(-1, 1);
+  }
 }
 
-export function nuevoEventoEnFlujo(tipo: Acciones, datos?: string) {
+export function nuevoEventoEnFlujo(tipo: Acciones, datos?: any) {
   document.body.dispatchEvent(
     new CustomEvent('enflujo', {
       detail: { tipo, datos },

@@ -10,6 +10,7 @@ import Manos from '@/componentes/Manos';
 import Voz from '@/componentes/Voz';
 import AnalisisCara from '@/componentes/AnalisisCaras';
 import Vision from '@/componentes/Vision';
+import type { Polarity } from 'polarity';
 
 const com = new Comunicacion('transmisor');
 let camara: HTMLVideoElement;
@@ -94,7 +95,7 @@ document.body.addEventListener('enflujo', (evento: CustomEventInit) => {
   }
 });
 
-function mandarDatosVoz(datos: string) {
+function mandarDatosVoz(datos: string | Polarity) {
   if (com.tieneAmigos) {
     for (const id in com.amigos) {
       const amigo = com.amigos[id];

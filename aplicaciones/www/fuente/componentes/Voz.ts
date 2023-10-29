@@ -1,14 +1,18 @@
-import { DatosVoz } from '@/programa';
-import { nuevoEventoEnFlujo } from '@/utilidades/ayudas';
+import { DatosVoz, DatosVozTexto } from '@/programa';
+import { escalarLienzo, nuevoEventoEnFlujo } from '@/utilidades/ayudas';
 import sentimientoVoz from '@/utilidades/sentimientoVoz';
 
 const Reconocimiento = window.SpeechRecognition || window.webkitSpeechRecognition;
-const Gramatica = window.SpeechGrammarList || window.webkitSpeechGrammarList;
-const ReconocimientoEvento = window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
-const sintetizador = window.speechSynthesis;
 
+export type HistoricoSentimientos = {
+  negativo: number;
+  positivo: number;
+  polaridad: number;
+};
 export default class Voz {
-  ctx?: AudioContext;
+  lienzo?: HTMLCanvasElement;
+  ctx?: CanvasRenderingContext2D;
+  ctxA?: AudioContext;
   maquina?: SpeechRecognition;
   flujo?: MediaStream;
   fuente?: MediaStreamAudioSourceNode;
@@ -16,20 +20,21 @@ export default class Voz {
   datos?: Float32Array;
   activo: boolean;
   textoEnVivo?: HTMLDivElement;
-  archivo?: HTMLDivElement;
   sensibilidadMax: number;
   hablando: boolean;
   reloj: number;
+  historico: number[];
 
   constructor() {
     this.activo = false;
     this.sensibilidadMax = 0;
     this.hablando = false;
     this.reloj = 0;
+    this.historico = [];
   }
 
   async cargarModelo() {
-    this.ctx = new AudioContext();
+    this.ctxA = new AudioContext();
 
     try {
       this.maquina = new Reconocimiento();
@@ -73,33 +78,38 @@ export default class Voz {
   }
 
   async prender() {
+    this.lienzo = document.createElement('canvas');
+    this.ctx = this.lienzo.getContext('2d') as CanvasRenderingContext2D;
+    this.lienzo.className = 'lienzo';
+
+    escalarLienzo(this.lienzo, this.ctx, false);
+    this.ctx.font = '15px Arial';
+    this.ctx.strokeStyle = 'yellow';
+    this.ctx.fillStyle = 'yellow';
     this.textoEnVivo = document.createElement('div');
-    this.archivo = document.createElement('div');
-
     this.textoEnVivo.id = 'textoEnVivo';
-    this.archivo.id = 'archivo';
 
-    document.body.appendChild(this.archivo);
     document.body.appendChild(this.textoEnVivo);
+    document.body.appendChild(this.lienzo);
 
     return this;
   }
 
   apagarModelo() {
     this.detener();
-    delete this.ctx;
+    delete this.ctxA;
     delete this.flujo;
-    window.cancelAnimationFrame(this.reloj);
+    if (this.lienzo) document.body.removeChild(this.lienzo);
   }
 
   apagar() {
     if (this.textoEnVivo) document.body.removeChild(this.textoEnVivo);
-    if (this.archivo) document.body.removeChild(this.archivo);
 
     this.activo = false;
     this.sensibilidadMax = 0;
     this.hablando = false;
     this.reloj = 0;
+    window.cancelAnimationFrame(this.reloj);
   }
 
   detener() {
@@ -113,23 +123,64 @@ export default class Voz {
   procesarResultado(transcripcion: string, yaTermino: boolean) {
     if (yaTermino) {
       const sentimiento = sentimientoVoz(transcripcion);
-      nuevoEventoEnFlujo('datosVoz', JSON.stringify(sentimiento));
+      nuevoEventoEnFlujo('datosVoz', sentimiento);
     } else {
       nuevoEventoEnFlujo('textoVoz', transcripcion);
     }
   }
 
-  pintar(datos: DatosVoz) {
-    if (!this.textoEnVivo || !this.archivo) return;
+  pintar(datos: DatosVoz | DatosVozTexto) {
+    if (!this.textoEnVivo) return;
 
     if (datos.tipo === 'textoVoz') {
       this.textoEnVivo.innerText = datos.datos;
     } else if (datos.tipo === 'datosVoz') {
-      // this.textoEnVivo.innerText = '';
-      // const frase = document.createElement('p');
-      // frase.innerText = `(sentiment: ${JSON.stringify(datos.datos, null, 2)})`;
-      // this.archivo.appendChild(frase);
+      const { polarity } = (datos as DatosVoz).datos;
+      this.historico.push(polarity);
+      this.actualizarDiagrama();
     }
+  }
+
+  actualizarDiagrama() {
+    if (!this.ctx) return;
+    const ctx = this.ctx;
+    const datos = this.historico;
+    const margen = 150;
+    const ancho = window.innerWidth - margen * 2;
+    const alto = window.innerHeight - margen * 2;
+    const pasoX = ancho / datos.length;
+    const pasoY = alto / 30;
+    const y = window.innerHeight / 6;
+    const ejeY = (valor: number) => valor * pasoY;
+    // console.log('pasoX', pasoX);
+
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    // ctx.save();
+    // ctx.strokeStyle = 'white';
+    // ctx.beginPath();
+    // ctx.moveTo(150, y);
+    // ctx.lineTo(ancho, y);
+    // // ctx.closePath();
+    // ctx.stroke();
+    // ctx.restore();
+
+    datos.forEach((punto, i) => {
+      const y2 = y - ejeY(punto);
+
+      if (i === 0) {
+        ctx.beginPath();
+        ctx.moveTo(margen, y);
+        ctx.lineTo(pasoX, y2);
+        ctx.fillText(`${punto}`, pasoX, y2);
+      } else {
+        ctx.lineTo(i * pasoX, y2);
+        ctx.fillText(`${punto}`, i * pasoX, y2);
+      }
+
+      // console.log(margen, y, i * pasoX, y2, punto);
+    });
+
+    ctx.stroke();
   }
 
   async definirSensilidad() {

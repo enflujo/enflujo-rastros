@@ -13,8 +13,8 @@ jobs:
       - name: 🦅 Actualizar build por SSH
         uses: appleboy/ssh-action@v0.1.10
         with:
-          host: ${{ secrets.DOMINIO }}
-          username: ${{ secrets.USUARIO }}
+          host: ${{ secrets.DOMINIO_AZURE }}
+          username: ${{ secrets.USUARIO_AZURE }}
           key: ${{ secrets.LLAVE_SSH }}
           script: |
             export NVM_DIR=~/.nvm
@@ -23,4 +23,3 @@ jobs:
             git pull origin main
             yarn install --frozen-lockfile
             yarn build
-            yarn servidor:reiniciar

@@ -160,7 +160,7 @@ async function activarPrograma(programa: Caras | Manos | Voz | AnalisisCara) {
 
     if (!modeloVision) {
       modeloVision = await FilesetResolver.forVisionTasks(
-        'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm'
+        'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.12/wasm'
       );
     }
 

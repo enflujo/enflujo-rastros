@@ -18,8 +18,8 @@
     "servidor:reiniciar": "pm2 restart ecosystem.config.js"
   },
   "devDependencies": {
-    "esbuild": "^0.19.5",
-    "prettier": "^3.0.3",
+    "esbuild": "^0.20.1",
+    "prettier": "^3.2.5",
     "rimraf": "^5.0.5"
   }
 }
